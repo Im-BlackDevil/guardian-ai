@@ -83,25 +83,25 @@ const HeroSection = () => {
             transition={{ duration: 0.8, delay: 0.4 }}
           >
             <span className="bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent bg-300% animate-pulse-slow">
-              Detect. Understand. Overcome Bias.
+              Protect Your Team from Hidden Biases.
             </span>
           </motion.h1>
 
           <motion.p
-            className="text-xl md:text-2xl text-muted-foreground mb-12 max-w-2xl mx-auto"
+            className="text-xl md:text-2xl text-muted-foreground mb-8 max-w-3xl mx-auto"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.6 }}
           >
-            Harness AI to identify cognitive biases in your text and make more objective decisions
+            Real-time AI detection of cognitive biases and toxic patterns in team communications.
           </motion.p>
 
-          {/* CTA Button */}
+          {/* CTA Buttons */}
           <motion.div
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.8, delay: 0.8 }}
-            className="mb-16"
+            className="mb-16 flex flex-col sm:flex-row gap-4 justify-center items-center"
           >
             <Button
               onClick={handleUpload}
@@ -126,6 +126,15 @@ const HeroSection = () => {
                   Upload Text / Document
                 </>
               )}
+            </Button>
+            
+            <Button
+              variant="outline"
+              size="lg"
+              className="text-lg px-8 py-6 border-primary/50 hover:bg-primary/10 hover:border-primary transition-all duration-300"
+            >
+              <Target className="mr-2 h-5 w-5" />
+              Try Live Demo
             </Button>
           </motion.div>
 

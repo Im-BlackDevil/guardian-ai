@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import Navigation from "@/components/Navigation";
 import HeroSection from "@/components/HeroSection";
 import BiasDetectionResults from "@/components/BiasDetectionResults";
+import TeamCollaborationIntegrations from "@/components/TeamCollaborationIntegrations";
 import AnalyticsDashboard from "@/components/AnalyticsDashboard";
 import InsightsPanel from "@/components/InsightsPanel";
 import Footer from "@/components/Footer";
@@ -19,6 +20,7 @@ const Index = () => {
       <main>
         <HeroSection />
         <BiasDetectionResults />
+        <TeamCollaborationIntegrations />
         <AnalyticsDashboard />
         <InsightsPanel />
       </main>

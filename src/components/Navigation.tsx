@@ -8,6 +8,7 @@ const Navigation = () => {
 
   const navItems = [
     { name: "Dashboard", href: "#dashboard", active: true },
+    { name: "Integrations", href: "#integrations", active: false },
     { name: "Reports", href: "#reports", active: false },
     { name: "About", href: "#about", active: false },
     { name: "Settings", href: "#settings", active: false },
