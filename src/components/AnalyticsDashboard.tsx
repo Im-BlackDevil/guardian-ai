@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
-import { TrendingUp, BarChart3, PieChart as PieChartIcon, Activity } from "lucide-react";
+import { TrendingUp, BarChart3, PieChart as PieChartIcon, Activity, RefreshCw } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { 
   PieChart, 
   Pie, 
@@ -14,31 +15,66 @@ import {
   ResponsiveContainer 
 } from "recharts";
 import { Progress } from "@/components/ui/progress";
+import { useState, useEffect } from "react";
 
 const AnalyticsDashboard = () => {
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [lastUpdated, setLastUpdated] = useState(new Date());
+
   // Mock data for charts
-  const biasDistributionData = [
+  const [biasDistributionData, setBiasDistributionData] = useState([
     { name: "Confirmation Bias", value: 35, color: "hsl(262, 83%, 58%)" },
     { name: "Anchoring Bias", value: 25, color: "hsl(240, 83%, 58%)" },
     { name: "Availability Bias", value: 20, color: "hsl(220, 83%, 58%)" },
     { name: "Framing Effect", value: 15, color: "hsl(200, 83%, 58%)" },
     { name: "Others", value: 5, color: "hsl(180, 83%, 58%)" }
-  ];
+  ]);
 
-  const timelineData = [
+  const [timelineData, setTimelineData] = useState([
     { month: "Jan", biases: 24 },
     { month: "Feb", biases: 31 },
     { month: "Mar", biases: 18 },
     { month: "Apr", biases: 42 },
     { month: "May", biases: 28 },
     { month: "Jun", biases: 35 }
-  ];
+  ]);
 
-  const overallBiasScore = 73; // Out of 100 (higher = more biased)
-  const biasReduction = 27; // Improvement percentage
+  const [overallBiasScore, setOverallBiasScore] = useState(73);
+  const [biasReduction, setBiasReduction] = useState(27);
+
+  const refreshData = () => {
+    setIsRefreshing(true);
+    // Simulate data refresh
+    setTimeout(() => {
+      // Update bias distribution with slight variations
+      setBiasDistributionData(prev => prev.map(item => ({
+        ...item,
+        value: Math.max(5, Math.min(40, item.value + (Math.random() - 0.5) * 10))
+      })));
+      
+      // Update timeline with new month
+      setTimelineData(prev => {
+        const newData = [...prev];
+        const lastMonth = newData[newData.length - 1];
+        newData.push({
+          month: "Jul",
+          biases: Math.floor(Math.random() * 30) + 20
+        });
+        return newData.slice(-6); // Keep last 6 months
+      });
+      
+      // Update overall score
+      setOverallBiasScore(prev => Math.max(50, Math.min(90, prev + (Math.random() - 0.5) * 10)));
+      setBiasReduction(prev => Math.max(20, Math.min(40, prev + (Math.random() - 0.5) * 5)));
+      
+      setLastUpdated(new Date());
+      setIsRefreshing(false);
+    }, 1500);
+  };
 
   return (
     <motion.section
+      id="dashboard"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.8 }}
@@ -51,8 +87,27 @@ const AnalyticsDashboard = () => {
           transition={{ duration: 0.6 }}
           className="text-center mb-12"
         >
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">Analytics Dashboard</h2>
-          <p className="text-xl text-muted-foreground">Comprehensive bias analysis insights</p>
+          <div className="flex flex-col sm:flex-row items-center justify-between mb-6">
+            <div className="flex-1">
+              <h2 className="text-3xl md:text-4xl font-bold mb-4">Analytics Dashboard</h2>
+              <p className="text-xl text-muted-foreground">Comprehensive bias analysis insights</p>
+            </div>
+            <div className="flex items-center space-x-4 mt-4 sm:mt-0">
+              <div className="text-sm text-muted-foreground">
+                Last updated: {lastUpdated.toLocaleTimeString()}
+              </div>
+              <Button
+                onClick={refreshData}
+                disabled={isRefreshing}
+                variant="outline"
+                size="sm"
+                className="flex items-center space-x-2"
+              >
+                <RefreshCw className={`h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
+                <span>{isRefreshing ? 'Updating...' : 'Refresh'}</span>
+              </Button>
+            </div>
+          </div>
         </motion.div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">

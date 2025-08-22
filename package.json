@@ -1,7 +1,8 @@
 {
-  "name": "vite_react_shadcn_ts",
+  "name": "biasguard-analytics",
+  "description": "AI-Powered Bias Detection Platform - Modern web application for detecting cognitive biases in team communications",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",

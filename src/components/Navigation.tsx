@@ -1,106 +1,78 @@
 import { motion } from "framer-motion";
-import { Shield, Menu, X } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { useState } from "react";
+import { Link, useLocation } from "react-router-dom";
+import { Shield, TrendingUp } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 
 const Navigation = () => {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-
-  const navItems = [
-    { name: "Dashboard", href: "#dashboard", active: true },
-    { name: "Integrations", href: "#integrations", active: false },
-    { name: "Reports", href: "#reports", active: false },
-    { name: "About", href: "#about", active: false },
-    { name: "Settings", href: "#settings", active: false },
+  const location = useLocation();
+  
+  const navigationItems = [
+    { name: "Dashboard", path: "/dashboard" },
+    { name: "Real-Time Bot", path: "/realtime-bot" },
+    { name: "Bias Engine", path: "/bias-engine" },
+    { name: "Integrations", path: "/integrations" },
+    { name: "Reports", path: "/reports" },
+    { name: "About", path: "/about" },
+    { name: "Settings", path: "/settings" },
   ];
+
+  const isActive = (path: string) => {
+    if (path === "/" && location.pathname === "/") return true;
+    if (path !== "/" && location.pathname.startsWith(path)) return true;
+    return false;
+  };
 
   return (
     <motion.nav
       initial={{ y: -100, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
-      transition={{ duration: 0.8 }}
-      className="fixed top-0 left-0 right-0 z-50 border-b border-border bg-background/80 backdrop-blur-lg"
+      transition={{ duration: 0.6 }}
+      className="sticky top-0 z-50 bg-card/80 backdrop-blur-md border-b border-border"
     >
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <motion.div
-            className="flex items-center space-x-2"
-            whileHover={{ scale: 1.05 }}
-            transition={{ type: "spring", stiffness: 400, damping: 10 }}
-          >
-            <div className="relative">
+          <Link to="/" className="flex items-center space-x-2">
+            <motion.div
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
               <Shield className="h-8 w-8 text-primary" />
-              <div className="absolute -top-1 -right-1 w-3 h-3 bg-primary rounded-full animate-pulse" />
-            </div>
-            <span className="text-xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-              BiasShield AI
-            </span>
-          </motion.div>
+            </motion.div>
+            <span className="text-xl font-bold">BiasShield AI</span>
+          </Link>
 
-          {/* Desktop Navigation */}
-          <div className="hidden md:block">
-            <div className="ml-10 flex items-baseline space-x-4">
-              {navItems.map((item) => (
-                <motion.a
-                  key={item.name}
-                  href={item.href}
-                  className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                    item.active
-                      ? "text-primary bg-primary/10"
-                      : "text-muted-foreground hover:text-foreground hover:bg-muted"
-                  }`}
-                  whileHover={{ y: -2 }}
-                  whileTap={{ y: 0 }}
-                >
-                  {item.name}
-                </motion.a>
-              ))}
-            </div>
+          {/* Navigation Links */}
+          <div className="hidden md:flex items-center space-x-1">
+            {navigationItems.map((item) => (
+              <Link
+                key={item.name}
+                to={item.path}
+                className={`px-3 py-2 rounded-md text-sm font-medium transition-all duration-200 ${
+                  isActive(item.path)
+                    ? "bg-primary text-primary-foreground"
+                    : "text-muted-foreground hover:text-foreground hover:bg-muted"
+                }`}
+              >
+                {item.name}
+              </Link>
+            ))}
           </div>
 
-          {/* Mobile menu button */}
-          <div className="md:hidden">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
+          {/* Right Side - Bias Counter */}
+          <div className="flex items-center space-x-4">
+            <motion.div
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ delay: 0.8, type: "spring" }}
             >
-              {isMenuOpen ? (
-                <X className="h-6 w-6" />
-              ) : (
-                <Menu className="h-6 w-6" />
-              )}
-            </Button>
+              <Badge variant="outline" className="bg-success/10 text-success border-success/20">
+                <TrendingUp className="h-3 w-3 mr-1" />
+                33 biases detected
+              </Badge>
+            </motion.div>
           </div>
         </div>
-
-        {/* Mobile Navigation */}
-        {isMenuOpen && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
-            exit={{ opacity: 0, height: 0 }}
-            className="md:hidden"
-          >
-            <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-              {navItems.map((item) => (
-                <a
-                  key={item.name}
-                  href={item.href}
-                  className={`block px-3 py-2 rounded-md text-base font-medium ${
-                    item.active
-                      ? "text-primary bg-primary/10"
-                      : "text-muted-foreground hover:text-foreground hover:bg-muted"
-                  }`}
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  {item.name}
-                </a>
-              ))}
-            </div>
-          </motion.div>
-        )}
       </div>
     </motion.nav>
   );

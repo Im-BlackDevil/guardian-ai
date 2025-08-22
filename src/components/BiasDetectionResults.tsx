@@ -55,6 +55,7 @@ const BiasDetectionResults = () => {
 
   return (
     <motion.section
+      id="bias-results"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.8 }}

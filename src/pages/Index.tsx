@@ -1,32 +1,16 @@
-import { motion } from "framer-motion";
-import Navigation from "@/components/Navigation";
 import HeroSection from "@/components/HeroSection";
-import BiasDetectionResults from "@/components/BiasDetectionResults";
-import TeamCollaborationIntegrations from "@/components/TeamCollaborationIntegrations";
-import AnalyticsDashboard from "@/components/AnalyticsDashboard";
-import InsightsPanel from "@/components/InsightsPanel";
+import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 
 const Index = () => {
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.5 }}
-      className="min-h-screen bg-background"
-    >
+    <div className="min-h-screen bg-background">
       <Navigation />
-      
       <main>
         <HeroSection />
-        <BiasDetectionResults />
-        <TeamCollaborationIntegrations />
-        <AnalyticsDashboard />
-        <InsightsPanel />
       </main>
-      
       <Footer />
-    </motion.div>
+    </div>
   );
 };
 

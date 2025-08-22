@@ -108,6 +108,43 @@ All colors MUST be HSL for consistency
   ::-webkit-scrollbar-thumb:hover {
     @apply bg-accent;
   }
+  
+  /* Chat scroll container specific styles */
+  .chat-scroll-container {
+    scrollbar-width: thin;
+    scrollbar-color: hsl(var(--border)) hsl(var(--muted));
+    /* Ensure proper scrolling behavior */
+    overflow-anchor: none;
+    /* Prevent page jumping */
+    scroll-behavior: smooth;
+  }
+  
+  .chat-scroll-container::-webkit-scrollbar {
+    width: 8px;
+  }
+  
+  .chat-scroll-container::-webkit-scrollbar-track {
+    background: hsl(var(--muted));
+    border-radius: 4px;
+    margin: 4px;
+  }
+  
+  .chat-scroll-container::-webkit-scrollbar-thumb {
+    background: hsl(var(--border));
+    border-radius: 4px;
+    border: 1px solid hsl(var(--muted));
+  }
+  
+  .chat-scroll-container::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--accent));
+  }
+  
+  /* Ensure chat container has proper height constraints */
+  .chat-container {
+    height: 100%;
+    max-height: 100%;
+    overflow: hidden;
+  }
 }
 
 @layer utilities {
