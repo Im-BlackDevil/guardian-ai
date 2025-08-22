@@ -14,6 +14,8 @@ import Reports from '@/pages/Reports';
 import About from '@/pages/About';
 import Settings from '@/pages/Settings';
 import NotFound from '@/pages/NotFound';
+import UploadPage from "@/pages/UploadPage";
+
 
 const queryClient = new QueryClient();
 
@@ -26,13 +28,16 @@ function App() {
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/realtime-bot" element={<RealTimeBot />} />
+              <Route path="/Try Live Demo" element={<RealTimeBot />} />
               <Route path="/bias-engine" element={<BiasEngine />} />
               <Route path="/integrations" element={<Integrations />} />
               <Route path="/reports" element={<Reports />} />
               <Route path="/about" element={<About />} />
               <Route path="/settings" element={<Settings />} />
               <Route path="*" element={<NotFound />} />
+              <Route path="/upload" element={<UploadPage />} />
+
+
             </Routes>
             <Toaster />
             <Sonner />

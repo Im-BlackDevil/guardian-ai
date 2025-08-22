@@ -1,14 +1,25 @@
 import { motion } from "framer-motion";
 import { MessageSquare, Users, GitBranch, Video, ArrowRight } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { useState } from "react";
 
 const TeamCollaborationIntegrations = () => {
+  const [expandedCard, setExpandedCard] = useState<string | null>(null);
+  
   const integrations = [
     {
       icon: MessageSquare,
       name: "Slack",
       description: "How BiasShield helps reduce bias in Slack",
       details: "Real-time detection of biased language in channels, direct messages, and thread discussions.",
+      expandedDetails: [
+        "Real-time monitoring of all Slack channels and DMs",
+        "Automatic bias detection in messages before they're sent",
+        "Smart suggestions for more inclusive language",
+        "Team bias analytics and reporting",
+        "Integration with Slack workflows and notifications"
+      ],
       gradient: "from-green-500/20 to-green-600/20",
       iconColor: "text-green-400"
     },
@@ -17,6 +28,13 @@ const TeamCollaborationIntegrations = () => {
       name: "Microsoft Teams",
       description: "How BiasShield helps reduce bias in Microsoft Teams",
       details: "Monitor meeting transcripts and chat conversations for unconscious bias patterns.",
+      expandedDetails: [
+        "Live meeting transcript analysis",
+        "Chat message bias detection in channels",
+        "Integration with Teams bots for instant feedback",
+        "Meeting summary reports with bias insights",
+        "Calendar integration for proactive bias prevention"
+      ],
       gradient: "from-blue-500/20 to-blue-600/20",
       iconColor: "text-blue-400"
     },
@@ -25,6 +43,13 @@ const TeamCollaborationIntegrations = () => {
       name: "GitHub",
       description: "How BiasShield helps reduce bias in GitHub",
       details: "Analyze code reviews, pull request comments, and issue discussions for inclusive language.",
+      expandedDetails: [
+        "Pull request comment analysis",
+        "Code review bias detection",
+        "Issue discussion monitoring",
+        "Automated inclusive language suggestions",
+        "Integration with GitHub Actions and webhooks"
+      ],
       gradient: "from-purple-500/20 to-purple-600/20",
       iconColor: "text-purple-400"
     },
@@ -33,10 +58,21 @@ const TeamCollaborationIntegrations = () => {
       name: "Zoom",
       description: "How BiasShield helps reduce bias in Zoom",
       details: "Post-meeting analysis of transcripts to identify bias patterns in video conferences.",
+      expandedDetails: [
+        "Automatic meeting transcript analysis",
+        "Real-time bias detection during calls",
+        "Post-meeting bias summary reports",
+        "Speaker bias pattern identification",
+        "Integration with Zoom Apps marketplace"
+      ],
       gradient: "from-indigo-500/20 to-indigo-600/20",
       iconColor: "text-indigo-400"
     }
   ];
+
+  const handleLearnMore = (integrationName: string) => {
+    setExpandedCard(expandedCard === integrationName ? null : integrationName);
+  };
 
   return (
     <section id="integrations" className="py-24 bg-card/50">
@@ -87,13 +123,48 @@ const TeamCollaborationIntegrations = () => {
                     {integration.details}
                   </p>
                   
-                  <motion.div 
-                    className="flex items-center text-primary text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                    whileHover={{ x: 5 }}
+                  {expandedCard === integration.name && (
+                    <motion.div
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: "auto" }}
+                      exit={{ opacity: 0, height: 0 }}
+                      transition={{ duration: 0.3 }}
+                      className="mb-4"
+                    >
+                      <div className="border-t border-border/30 pt-4">
+                        <h4 className="text-sm font-semibold text-foreground mb-3">Key Features:</h4>
+                        <ul className="space-y-2">
+                          {integration.expandedDetails.map((detail, idx) => (
+                            <motion.li
+                              key={idx}
+                              initial={{ opacity: 0, x: -10 }}
+                              animate={{ opacity: 1, x: 0 }}
+                              transition={{ duration: 0.2, delay: idx * 0.1 }}
+                              className="text-xs text-muted-foreground flex items-start"
+                            >
+                              <span className="inline-block w-1.5 h-1.5 rounded-full bg-primary/60 mt-1.5 mr-2 flex-shrink-0" />
+                              {detail}
+                            </motion.li>
+                          ))}
+                        </ul>
+                      </div>
+                    </motion.div>
+                  )}
+                  
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => handleLearnMore(integration.name)}
+                    className="flex items-center text-primary text-sm font-medium p-0 h-auto hover:bg-transparent hover:text-primary/80 opacity-0 group-hover:opacity-100 transition-all duration-300"
                   >
-                    Learn more
-                    <ArrowRight className="ml-1 h-4 w-4" />
-                  </motion.div>
+                    <motion.div 
+                      className="flex items-center"
+                      whileHover={{ x: 5 }}
+                    >
+                      {expandedCard === integration.name ? "Show less" : "Learn more"}
+                      <ArrowRight className={`ml-1 h-4 w-4 transition-transform duration-200 ${expandedCard === integration.name ? "rotate-90" : ""}`} />
+                    </motion.div>
+                  </Button>
                 </CardContent>
               </Card>
             </motion.div>

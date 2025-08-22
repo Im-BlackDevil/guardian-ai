@@ -1,29 +1,25 @@
 import { motion } from "framer-motion";
-import { MessageSquare, Bot, AlertTriangle, CheckCircle, Send, Zap, Shield } from "lucide-react";
+import { MessageSquare, Bot, AlertTriangle, CheckCircle, Send, Zap, Shield, TrendingUp, Brain, Target, Users, AlertCircle } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { useState, useRef, useEffect } from "react";
+import { biasDetectionService, BiasAnalysis, TextAnalysis } from "@/lib/biasDetectionService";
 
 interface ChatMessage {
   id: string;
   text: string;
   sender: 'user' | 'bot';
   timestamp: Date;
-  biasDetected?: {
-    type: string;
-    explanation: string;
-    suggestion: string;
-    severity: 'low' | 'medium' | 'high';
-  };
+  biasAnalysis?: TextAnalysis;
 }
 
 const RealTimeBiasBot = () => {
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       id: '1',
-      text: "Welcome to BiasShield AI! I'm here to help detect biases in real-time. Try typing something that might contain bias...",
+      text: "Welcome to BiasShield AI! I'm here to help detect biases in real-time using advanced AI analysis. Try typing something that might contain bias...",
       sender: 'bot',
       timestamp: new Date()
     }
@@ -40,7 +36,7 @@ const RealTimeBiasBot = () => {
     stereotyping: 0
   });
   const messagesEndRef = useRef<HTMLDivElement>(null);
-    const [isDemoRunning, setIsDemoRunning] = useState(false);
+  const [isDemoRunning, setIsDemoRunning] = useState(false);
   
   // Predefined bias statements for demo
   const biasDemoStatements = [
@@ -73,94 +69,6 @@ const RealTimeBiasBot = () => {
     }
   }, [messages.length]);
 
-  // Enhanced bias detection logic (in real app, this would call OpenAI API)
-  const detectBias = (text: string): ChatMessage['biasDetected'] | null => {
-    const lowerText = text.toLowerCase();
-    
-    // Enhanced Gender/Cultural bias detection
-    if (lowerText.includes('males are') || lowerText.includes('females are') ||
-        lowerText.includes('men are') || lowerText.includes('women are') ||
-        lowerText.includes('guys are') || lowerText.includes('girls are') ||
-        lowerText.includes('this guy is from') || lowerText.includes('she\'s a woman') ||
-        lowerText.includes('cultural background') || lowerText.includes('ethnicity') ||
-        lowerText.includes('race') || lowerText.includes('nationality') ||
-        lowerText.includes('religion') || lowerText.includes('age group') ||
-        lowerText.includes('older people') || lowerText.includes('younger people')) {
-      return {
-        type: 'Gender/Cultural Bias',
-        explanation: 'Making broad generalizations based on identity characteristics',
-        suggestion: 'Evaluate individuals based on their actions and abilities, not demographics',
-        severity: 'high'
-      };
-    }
-    
-    // Enhanced Groupthink detection
-    if (lowerText.includes('everyone agrees') || lowerText.includes('we all think') || 
-        lowerText.includes('nobody disagrees') || lowerText.includes('let\'s finalize this') ||
-        lowerText.includes('consensus') || lowerText.includes('unanimous') ||
-        lowerText.includes('all of us') || lowerText.includes('the whole team')) {
-      return {
-        type: 'Groupthink Bias',
-        explanation: 'Assuming consensus without considering dissenting views',
-        suggestion: 'Actively seek diverse perspectives before making decisions',
-        severity: 'medium'
-      };
-    }
-    
-    // Enhanced Anchoring bias detection
-    if (lowerText.includes('first impression') || lowerText.includes('initial thought') ||
-        lowerText.includes('started with') || lowerText.includes('began with') ||
-        lowerText.includes('first thing') || lowerText.includes('at first') ||
-        lowerText.includes('originally') || lowerText.includes('initially')) {
-      return {
-        type: 'Anchoring Bias',
-        explanation: 'Relying too heavily on first piece of information',
-        suggestion: 'Evaluate all information equally, not just initial data',
-        severity: 'low'
-      };
-    }
-    
-    // Enhanced Toxic/offensive tone detection
-    if (lowerText.includes('stupid') || lowerText.includes('idiot') || 
-        lowerText.includes('terrible') || lowerText.includes('awful') ||
-        lowerText.includes('hate') || lowerText.includes('disgusting') ||
-        lowerText.includes('useless') || lowerText.includes('worthless') ||
-        lowerText.includes('ridiculous') || lowerText.includes('nonsense') ||
-        lowerText.includes('crazy') || lowerText.includes('insane')) {
-      return {
-        type: 'Toxic Tone',
-        explanation: 'Using emotionally charged or offensive language',
-        suggestion: 'Express concerns constructively and professionally',
-        severity: 'high'
-      };
-    }
-    
-    // New: Confirmation bias detection
-    if (lowerText.includes('proves my point') || lowerText.includes('confirms what i thought') ||
-        lowerText.includes('as expected') || lowerText.includes('i knew it') ||
-        lowerText.includes('told you so') || lowerText.includes('obviously')) {
-      return {
-        type: 'Confirmation Bias',
-        explanation: 'Seeking information that confirms existing beliefs',
-        suggestion: 'Consider evidence that challenges your assumptions',
-        severity: 'medium'
-      };
-    }
-    
-    // New: Stereotyping detection
-    if (lowerText.includes('all') && (lowerText.includes('people') || lowerText.includes('men') || 
-        lowerText.includes('women') || lowerText.includes('students') || lowerText.includes('workers'))) {
-      return {
-        type: 'Stereotyping Bias',
-        explanation: 'Applying broad generalizations to entire groups',
-        suggestion: 'Treat each person as an individual, not as a representative of a group',
-        severity: 'high'
-      };
-    }
-    
-    return null;
-  };
-
   const handleSendMessage = async () => {
     if (!inputText.trim()) return;
     
@@ -175,29 +83,29 @@ const RealTimeBiasBot = () => {
     setInputText('');
     setIsAnalyzing(true);
     
-    // Simulate AI analysis delay
-    setTimeout(() => {
-      const biasDetected = detectBias(inputText);
+    try {
+      // Use the advanced bias detection service
+      const analysis = await biasDetectionService.analyzeText(inputText);
       
-      if (biasDetected) {
+      if (analysis.biases.length > 0) {
         // Update bias statistics
         setBiasStats(prev => ({
           total: prev.total + 1,
-          groupthink: prev.groupthink + (biasDetected.type.includes('Groupthink') ? 1 : 0),
-          anchoring: prev.anchoring + (biasDetected.type.includes('Anchoring') ? 1 : 0),
-          genderCultural: prev.genderCultural + (biasDetected.type.includes('Gender/Cultural') ? 1 : 0),
-          toxic: prev.toxic + (biasDetected.type.includes('Toxic') ? 1 : 0),
-          confirmation: prev.confirmation + (biasDetected.type.includes('Confirmation') ? 1 : 0),
-          stereotyping: prev.stereotyping + (biasDetected.type.includes('Stereotyping') ? 1 : 0)
+          groupthink: prev.groupthink + (analysis.biases.some(b => b.type.includes('Groupthink')) ? 1 : 0),
+          anchoring: prev.anchoring + (analysis.biases.some(b => b.type.includes('Anchoring')) ? 1 : 0),
+          genderCultural: prev.genderCultural + (analysis.biases.some(b => b.type.includes('Gender/Cultural')) ? 1 : 0),
+          toxic: prev.toxic + (analysis.biases.some(b => b.type.includes('Toxic')) ? 1 : 0),
+          confirmation: prev.confirmation + (analysis.biases.some(b => b.type.includes('Confirmation')) ? 1 : 0),
+          stereotyping: prev.stereotyping + (analysis.biases.some(b => b.type.includes('Stereotyping')) ? 1 : 0)
         }));
         
-        // Add bias detection message
+        // Add detailed bias analysis message
         const botMessage: ChatMessage = {
           id: (Date.now() + 1).toString(),
-          text: `🚨 **Bias Detected: ${biasDetected.type}**\n\n💡 **Explanation:** ${biasDetected.explanation}\n\n✨ **Suggestion:** ${biasDetected.suggestion}`,
+          text: `🚨 **Bias Detection Results**\n\n**Overall Risk:** ${analysis.overallRisk.toUpperCase()}\n**Toxicity Score:** ${(analysis.toxicityScore * 100).toFixed(0)}%\n**Processing Time:** ${analysis.processingTime}ms\n\n**Detected Biases:**\n${analysis.biases.map(bias => `• ${bias.type} (${bias.confidence * 100}% confidence, ${bias.severity} severity)`).join('\n')}\n\n**Recommendations:**\n${analysis.recommendations.map(rec => `• ${rec}`).join('\n')}`,
           sender: 'bot',
           timestamp: new Date(),
-          biasDetected
+          biasAnalysis: analysis
         };
         
         setMessages(prev => [...prev, botMessage]);
@@ -205,16 +113,26 @@ const RealTimeBiasBot = () => {
         // Add confirmation message
         const botMessage: ChatMessage = {
           id: (Date.now() + 1).toString(),
-          text: '✅ No biases detected in this message. Great job communicating objectively!',
+          text: `✅ **No Biases Detected**\n\n**Overall Risk:** ${analysis.overallRisk.toUpperCase()}\n**Toxicity Score:** ${(analysis.toxicityScore * 100).toFixed(0)}%\n**Processing Time:** ${analysis.processingTime}ms\n\n**Analysis:** Your message appears to be bias-free and professional.\n\n**Recommendations:**\n${analysis.recommendations.map(rec => `• ${rec}`).join('\n')}`,
           sender: 'bot',
-          timestamp: new Date()
+          timestamp: new Date(),
+          biasAnalysis: analysis
         };
         
         setMessages(prev => [...prev, botMessage]);
       }
-      
+    } catch (error) {
+      console.error('Bias detection error:', error);
+      const errorMessage: ChatMessage = {
+        id: (Date.now() + 1).toString(),
+        text: '❌ **Analysis Error**\n\nSorry, there was an error analyzing your message. Please try again.',
+        sender: 'bot',
+        timestamp: new Date()
+      };
+      setMessages(prev => [...prev, errorMessage]);
+    } finally {
       setIsAnalyzing(false);
-    }, 1500);
+    }
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -236,13 +154,13 @@ const RealTimeBiasBot = () => {
   const getSeverityIcon = (severity: string) => {
     switch (severity) {
       case 'high': return <AlertTriangle className="h-4 w-4" />;
-      case 'medium': return <AlertTriangle className="h-4 w-4" />;
+      case 'medium': return <AlertCircle className="h-4 w-4" />;
       case 'low': return <CheckCircle className="h-4 w-4" />;
       default: return <Shield className="h-4 w-4" />;
     }
   };
 
-  const demoChat = () => {
+  const demoChat = async () => {
     if (isDemoRunning) return;
     
     setIsDemoRunning(true);
@@ -261,29 +179,29 @@ const RealTimeBiasBot = () => {
     
     setMessages(prev => [...prev, userMessage]);
     
-    // Simulate AI analysis delay
-    setTimeout(() => {
-      const biasDetected = detectBias(selectedStatement);
+    try {
+      // Use the advanced bias detection service
+      const analysis = await biasDetectionService.analyzeText(selectedStatement);
       
-      if (biasDetected) {
+      if (analysis.biases.length > 0) {
         // Update bias statistics
         setBiasStats(prev => ({
           total: prev.total + 1,
-          groupthink: prev.groupthink + (biasDetected.type.includes('Groupthink') ? 1 : 0),
-          anchoring: prev.anchoring + (biasDetected.type.includes('Anchoring') ? 1 : 0),
-          genderCultural: prev.genderCultural + (biasDetected.type.includes('Gender/Cultural') ? 1 : 0),
-          toxic: prev.toxic + (biasDetected.type.includes('Toxic') ? 1 : 0),
-          confirmation: prev.confirmation + (biasDetected.type.includes('Confirmation') ? 1 : 0),
-          stereotyping: prev.stereotyping + (biasDetected.type.includes('Stereotyping') ? 1 : 0)
+          groupthink: prev.groupthink + (analysis.biases.some(b => b.type.includes('Groupthink')) ? 1 : 0),
+          anchoring: prev.anchoring + (analysis.biases.some(b => b.type.includes('Anchoring')) ? 1 : 0),
+          genderCultural: prev.genderCultural + (analysis.biases.some(b => b.type.includes('Gender/Cultural')) ? 1 : 0),
+          toxic: prev.toxic + (analysis.biases.some(b => b.type.includes('Toxic')) ? 1 : 0),
+          confirmation: prev.confirmation + (analysis.biases.some(b => b.type.includes('Confirmation')) ? 1 : 0),
+          stereotyping: prev.stereotyping + (analysis.biases.some(b => b.type.includes('Stereotyping')) ? 1 : 0)
         }));
         
-        // Add bias detection message
+        // Add detailed bias analysis message
         const botMessage: ChatMessage = {
           id: `demo-bot-${Date.now()}`,
-          text: `🚨 **Bias Detected: ${biasDetected.type}**\n\n💡 **Explanation:** ${biasDetected.explanation}\n\n✨ **Suggestion:** ${biasDetected.suggestion}`,
+          text: `🚨 **Demo Analysis Results**\n\n**Overall Risk:** ${analysis.overallRisk.toUpperCase()}\n**Toxicity Score:** ${(analysis.toxicityScore * 100).toFixed(0)}%\n**Processing Time:** ${analysis.processingTime}ms\n\n**Detected Biases:**\n${analysis.biases.map(bias => `• ${bias.type} (${bias.confidence * 100}% confidence, ${bias.severity} severity)`).join('\n')}\n\n**Recommendations:**\n${analysis.recommendations.map(rec => `• ${rec}`).join('\n')}`,
           sender: 'bot',
           timestamp: new Date(),
-          biasDetected
+          biasAnalysis: analysis
         };
         
         setMessages(prev => [...prev, botMessage]);
@@ -291,16 +209,26 @@ const RealTimeBiasBot = () => {
         // Add confirmation message
         const botMessage: ChatMessage = {
           id: `demo-bot-${Date.now()}`,
-          text: '✅ No biases detected in this message. Great job communicating objectively!',
+          text: `✅ **Demo Analysis Complete**\n\n**Overall Risk:** ${analysis.overallRisk.toUpperCase()}\n**Toxicity Score:** ${(analysis.toxicityScore * 100).toFixed(0)}%\n**Processing Time:** ${analysis.processingTime}ms\n\n**Analysis:** This demo message appears to be bias-free.\n\n**Recommendations:**\n${analysis.recommendations.map(rec => `• ${rec}`).join('\n')}`,
           sender: 'bot',
-          timestamp: new Date()
+          timestamp: new Date(),
+          biasAnalysis: analysis
         };
         
         setMessages(prev => [...prev, botMessage]);
       }
-      
+    } catch (error) {
+      console.error('Demo analysis error:', error);
+      const errorMessage: ChatMessage = {
+        id: `demo-bot-${Date.now()}`,
+        text: '❌ **Demo Analysis Error**\n\nSorry, there was an error analyzing the demo message. Please try again.',
+        sender: 'bot',
+        timestamp: new Date()
+      };
+      setMessages(prev => [...prev, errorMessage]);
+    } finally {
       setIsDemoRunning(false);
-    }, 1500);
+    }
   };
 
 
@@ -334,131 +262,128 @@ const RealTimeBiasBot = () => {
             transition={{ duration: 0.6, delay: 0.2 }}
             className="lg:col-span-2"
           >
-                         <Card className="shadow-card h-[600px] flex flex-col overflow-hidden relative chat-container" style={{ minHeight: '600px' }}>
-              <CardHeader className="border-b border-border">
-                <CardTitle className="flex items-center">
-                  <MessageSquare className="h-5 w-5 mr-2 text-primary" />
-                  Live Chat Simulation
-                  <Badge variant="outline" className="ml-2 bg-success/10 text-success border-success/20">
-                    <Bot className="h-3 w-3 mr-1" />
-                    AI Active
-                  </Badge>
-                </CardTitle>
-              </CardHeader>
-              
-              <CardContent className="flex-1 flex flex-col p-0">
-                                                  {/* Messages Area - Contained within chat box boundaries */}
-                 <div className="flex-1 overflow-y-auto p-4 space-y-4 relative border-r border-border/20 chat-scroll-container" style={{ scrollbarWidth: 'thin' }}>
-                   {/* All messages stay within this container */}
-                   <div className="min-h-full pb-4">
-                     {messages.map((message) => (
-                       <motion.div
-                         key={message.id}
-                         initial={{ opacity: 0, y: 20 }}
-                         animate={{ opacity: 1, y: 0 }}
-                         className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'} mb-4`}
-                       >
-                         <div className={`max-w-[80%] ${message.sender === 'user' ? 'order-2' : 'order-1'}`}>
-                           <div className={`rounded-lg p-3 ${
-                             message.sender === 'user' 
-                               ? 'bg-primary text-primary-foreground' 
-                               : 'bg-muted'
-                           }`}>
-                             <div className="text-sm whitespace-pre-wrap break-words">{message.text}</div>
-                             <div className={`text-xs mt-2 ${
-                               message.sender === 'user' ? 'text-primary-foreground/70' : 'text-muted-foreground'
-                             }`}>
-                               {message.timestamp.toLocaleTimeString()}
-                             </div>
-                           </div>
+                         <Card className="shadow-card h-[600px] flex flex-col overflow-hidden">
+                           <CardHeader className="border-b border-border flex-shrink-0">
+                             <CardTitle className="flex items-center">
+                               <MessageSquare className="h-5 w-5 mr-2 text-primary" />
+                               Live Chat Simulation
+                               <Badge variant="outline" className="ml-2 bg-success/10 text-success border-success/20">
+                                 <Bot className="h-3 w-3 mr-1" />
+                                 AI Active
+                               </Badge>
+                             </CardTitle>
+                           </CardHeader>
                            
-                           {/* Bias Detection Badge - Contained within message */}
-                           {message.biasDetected && (
-                             <motion.div
-                               initial={{ scale: 0.8, opacity: 0 }}
-                               animate={{ scale: 1, opacity: 1 }}
-                               className={`mt-2 flex items-center space-x-2 ${getSeverityColor(message.biasDetected.severity)} px-3 py-2 rounded-md border max-w-full`}
-                             >
-                               {getSeverityIcon(message.biasDetected.severity)}
-                               <span className="text-xs font-medium truncate">{message.biasDetected.type}</span>
-                             </motion.div>
-                           )}
-                         </div>
-                       </motion.div>
-                     ))}
-                     
-                     {/* Analyzing indicator - Contained within chat box */}
-                     {isAnalyzing && (
-                       <motion.div
-                         initial={{ opacity: 0, scale: 0.8 }}
-                         animate={{ opacity: 1, scale: 1 }}
-                         className="flex justify-start mb-4"
-                       >
-                         <div className="bg-muted rounded-lg p-3 max-w-[80%]">
-                           <div className="flex items-center space-x-2">
-                             <motion.div
-                               animate={{ rotate: 360 }}
-                               transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                             >
-                               <Zap className="h-4 w-4 text-primary" />
-                             </motion.div>
-                             <span className="text-sm text-muted-foreground">Analyzing for biases...</span>
-                           </div>
-                         </div>
-                       </motion.div>
-                     )}
-                     
-                     {/* Demo analyzing indicator - Contained within chat box */}
-                     {isDemoRunning && (
-                       <motion.div
-                         initial={{ opacity: 0, scale: 0.8 }}
-                         animate={{ opacity: 1, scale: 1 }}
-                         className="flex justify-start mb-4"
-                       >
-                         <div className="bg-primary/10 border border-primary/20 rounded-lg p-3 max-w-[80%]">
-                           <div className="flex items-center space-x-2">
-                             <motion.div
-                               animate={{ rotate: 360 }}
-                               transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                             >
-                               <Bot className="h-4 w-4 text-primary" />
-                             </motion.div>
-                             <span className="text-sm text-primary font-medium">Analyzing demo message...</span>
-                           </div>
-                         </div>
-                       </motion.div>
-                     )}
-                     
-                     {/* Scroll anchor - Hidden but functional */}
-                     <div ref={messagesEndRef} className="h-0" />
-                   </div>
-                 </div>
-                
-                {/* Input Area */}
-                <div className="border-t border-border p-4">
-                  <div className="flex space-x-2">
-                    <Input
-                      value={inputText}
-                      onChange={(e) => setInputText(e.target.value)}
-                      onKeyPress={handleKeyPress}
-                      placeholder="Type a message to test bias detection..."
-                      className="flex-1"
-                      disabled={isAnalyzing}
-                    />
-                    <Button 
-                      onClick={handleSendMessage} 
-                      disabled={!inputText.trim() || isAnalyzing}
-                      size="sm"
-                    >
-                      <Send className="h-4 w-4" />
-                    </Button>
-                  </div>
-                                     <p className="text-xs text-muted-foreground mt-2">
-                     Try phrases like "Everyone agrees with this" or "This guy is from IIT, he'll be better", or click "Demo Chat" for a random bias example
-                   </p>
-                </div>
-              </CardContent>
-            </Card>
+                           <CardContent className="flex-1 flex flex-col p-0 min-h-0">
+                             {/* Messages Area - Fixed height with proper scrolling */}
+                             <div className="flex-1 overflow-y-auto p-4 space-y-4 min-h-0">
+                               {messages.map((message) => (
+                                 <motion.div
+                                   key={message.id}
+                                   initial={{ opacity: 0, y: 20 }}
+                                   animate={{ opacity: 1, y: 0 }}
+                                   className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'} mb-4`}
+                                 >
+                                   <div className={`max-w-[80%] ${message.sender === 'user' ? 'order-2' : 'order-1'}`}>
+                                     <div className={`rounded-lg p-3 ${
+                                       message.sender === 'user' 
+                                         ? 'bg-primary text-primary-foreground' 
+                                         : 'bg-muted'
+                                     }`}>
+                                       <div className="text-sm whitespace-pre-wrap break-words">{message.text}</div>
+                                       <div className={`text-xs mt-2 ${
+                                         message.sender === 'user' ? 'text-primary-foreground/70' : 'text-muted-foreground'
+                                       }`}>
+                                         {message.timestamp.toLocaleTimeString()}
+                                       </div>
+                                     </div>
+                                     
+                                     {/* Bias Detection Badge */}
+                                     {message.biasAnalysis && (
+                                       <motion.div
+                                         initial={{ scale: 0.8, opacity: 0 }}
+                                         animate={{ scale: 1, opacity: 1 }}
+                                         className={`mt-2 flex items-center space-x-2 ${getSeverityColor(message.biasAnalysis.overallRisk)} px-3 py-2 rounded-md border max-w-full`}
+                                       >
+                                         {getSeverityIcon(message.biasAnalysis.overallRisk)}
+                                         <span className="text-xs font-medium truncate">{message.biasAnalysis.overallRisk.toUpperCase()}</span>
+                                       </motion.div>
+                                     )}
+                                   </div>
+                                 </motion.div>
+                               ))}
+                               
+                               {/* Analyzing indicator */}
+                               {isAnalyzing && (
+                                 <motion.div
+                                   initial={{ opacity: 0, scale: 0.8 }}
+                                   animate={{ opacity: 1, scale: 1 }}
+                                   className="flex justify-start mb-4"
+                                 >
+                                   <div className="bg-muted rounded-lg p-3 max-w-[80%]">
+                                     <div className="flex items-center space-x-2">
+                                       <motion.div
+                                         animate={{ rotate: 360 }}
+                                         transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                                       >
+                                         <Zap className="h-4 w-4 text-primary" />
+                                       </motion.div>
+                                       <span className="text-sm text-muted-foreground">Analyzing for biases...</span>
+                                     </div>
+                                   </div>
+                                 </motion.div>
+                               )}
+                               
+                               {/* Demo analyzing indicator */}
+                               {isDemoRunning && (
+                                 <motion.div
+                                   initial={{ opacity: 0, scale: 0.8 }}
+                                   animate={{ opacity: 1, scale: 1 }}
+                                   className="flex justify-start mb-4"
+                                 >
+                                   <div className="bg-primary/10 border border-primary/20 rounded-lg p-3 max-w-[80%]">
+                                     <div className="flex items-center space-x-2">
+                                       <motion.div
+                                         animate={{ rotate: 360 }}
+                                         transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                                       >
+                                         <Bot className="h-4 w-4 text-primary" />
+                                       </motion.div>
+                                       <span className="text-sm text-primary font-medium">Analyzing demo message...</span>
+                                     </div>
+                                   </div>
+                                 </motion.div>
+                               )}
+                               
+                               {/* Scroll anchor */}
+                               <div ref={messagesEndRef} className="h-0" />
+                             </div>
+                           
+                             {/* Input Area - Fixed at bottom */}
+                             <div className="border-t border-border p-4 flex-shrink-0">
+                               <div className="flex space-x-2">
+                                 <Input
+                                   value={inputText}
+                                   onChange={(e) => setInputText(e.target.value)}
+                                   onKeyPress={handleKeyPress}
+                                   placeholder="Type a message to test bias detection..."
+                                   className="flex-1"
+                                   disabled={isAnalyzing}
+                                 />
+                                 <Button 
+                                   onClick={handleSendMessage} 
+                                   disabled={!inputText.trim() || isAnalyzing}
+                                   size="sm"
+                                 >
+                                   <Send className="h-4 w-4" />
+                                 </Button>
+                               </div>
+                               <p className="text-xs text-muted-foreground mt-2">
+                                 Try phrases like "Everyone agrees with this" or "This guy is from IIT, he'll be better", or click "Demo Chat" for a random bias example
+                               </p>
+                             </div>
+                           </CardContent>
+                         </Card>
           </motion.div>
 
           {/* Bias Statistics */}
@@ -535,7 +460,7 @@ const RealTimeBiasBot = () => {
                                            onClick={() => {
                         setMessages([{
                           id: '1',
-                          text: "Welcome to BiasShield AI! I'm here to help detect biases in real-time. Try typing something that might contain bias...",
+                          text: "Welcome to BiasShield AI! I'm here to help detect biases in real-time using advanced AI analysis. Try typing something that might contain bias...",
                           sender: 'bot',
                           timestamp: new Date()
                         }]);

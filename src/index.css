@@ -145,6 +145,33 @@ All colors MUST be HSL for consistency
     max-height: 100%;
     overflow: hidden;
   }
+  
+  /* Fix for chat scrolling */
+  .chat-messages-area {
+    flex: 1;
+    overflow-y: auto;
+    min-height: 0;
+    scrollbar-width: thin;
+    scrollbar-color: hsl(var(--border)) hsl(var(--muted));
+  }
+  
+  .chat-messages-area::-webkit-scrollbar {
+    width: 8px;
+  }
+  
+  .chat-messages-area::-webkit-scrollbar-track {
+    background: hsl(var(--muted));
+    border-radius: 4px;
+  }
+  
+  .chat-messages-area::-webkit-scrollbar-thumb {
+    background: hsl(var(--border));
+    border-radius: 4px;
+  }
+  
+  .chat-messages-area::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--accent));
+  }
 }
 
 @layer utilities {
