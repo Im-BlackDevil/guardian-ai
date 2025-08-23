@@ -9,11 +9,13 @@ import {
   X, 
   AlertCircle,
   CheckCircle,
-  Loader2
+  Loader2,
+  Download
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Separator } from '@/components/ui/separator';
 import { FileProcessor, FileContent, BiasAnalysisResult } from '@/utils/fileProcessor';
 import { BiasAnalyzer } from '@/utils/biasAnalyzer';
 import BiasCharts from '@/components/BiasCharts';
@@ -26,6 +28,8 @@ const UploadPage = () => {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isDownloading, setIsDownloading] = useState(false);
+  const [downloadStatus, setDownloadStatus] = useState<'idle' | 'success' | 'error'>('idle');
+  const [downloadMessage, setDownloadMessage] = useState<string>('');
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const supportedFormats = [
@@ -42,6 +46,8 @@ const UploadPage = () => {
       setFileContent(null);
       setAnalysisResult(null);
       setError(null);
+      setDownloadStatus('idle');
+      setDownloadMessage('');
     }
   };
 
@@ -53,6 +59,8 @@ const UploadPage = () => {
       setFileContent(null);
       setAnalysisResult(null);
       setError(null);
+      setDownloadStatus('idle');
+      setDownloadMessage('');
     }
   };
 
@@ -65,6 +73,8 @@ const UploadPage = () => {
     setFileContent(null);
     setAnalysisResult(null);
     setError(null);
+    setDownloadStatus('idle');
+    setDownloadMessage('');
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
@@ -75,6 +85,8 @@ const UploadPage = () => {
 
     setIsAnalyzing(true);
     setError(null);
+    setDownloadStatus('idle');
+    setDownloadMessage('');
 
     try {
       // Process file and extract text
@@ -95,14 +107,47 @@ const UploadPage = () => {
     if (!file || !analysisResult) return;
 
     setIsDownloading(true);
+    setDownloadStatus('idle');
+    setDownloadMessage('Generating bias-free document...');
+
     try {
-      await FileProcessor.generateBiasFreeDocument(
+      const downloadSuccess = await FileProcessor.generateBiasFreeDocument(
         file,
         analysisResult.improvedText,
         analysisResult
       );
+      
+      if (downloadSuccess) {
+        // Success
+        setDownloadStatus('success');
+        if (file.name.toLowerCase().endsWith('.pdf')) {
+          setDownloadMessage('PDF generated successfully via backend API! Check your downloads folder.');
+        } else {
+          setDownloadMessage('Document generated successfully! Check your downloads folder.');
+        }
+      } else {
+        // Partial success - document generated but download may have failed
+        setDownloadStatus('success');
+        setDownloadMessage('Document generated! If download didn\'t start, check your browser\'s download settings.');
+      }
+      
+      // Reset status after 5 seconds
+      setTimeout(() => {
+        setDownloadStatus('idle');
+        setDownloadMessage('');
+      }, 5000);
+      
     } catch (err) {
-      setError('Failed to generate bias-free document');
+      setDownloadStatus('error');
+      const errorMessage = err instanceof Error ? err.message : 'Unknown error occurred';
+      
+      if (errorMessage.includes('Backend API error') || errorMessage.includes('Backend PDF generation failed')) {
+        setDownloadMessage('Backend API error. Please make sure the backend server is running on port 3001.');
+      } else {
+        setDownloadMessage('Failed to generate bias-free document. Please try again.');
+      }
+      
+      console.error('Download error:', err);
     } finally {
       setIsDownloading(false);
     }
@@ -229,6 +274,37 @@ const UploadPage = () => {
                   <div className="flex items-center gap-2 text-destructive">
                     <AlertCircle className="h-5 w-5" />
                     <span className="font-medium">Error: {error}</span>
+                  </div>
+                </CardContent>
+              </Card>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Download Status */}
+        <AnimatePresence>
+          {downloadStatus !== 'idle' && (
+            <motion.div
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              className="mb-6"
+            >
+              <Card className={`border-2 ${
+                downloadStatus === 'success' 
+                  ? 'border-success/20 bg-success/5' 
+                  : 'border-destructive/20 bg-destructive/5'
+              }`}>
+                <CardContent className="p-4">
+                  <div className={`flex items-center gap-2 ${
+                    downloadStatus === 'success' ? 'text-success' : 'text-destructive'
+                  }`}>
+                    {downloadStatus === 'success' ? (
+                      <CheckCircle className="h-5 w-5" />
+                    ) : (
+                      <AlertCircle className="h-5 w-5" />
+                    )}
+                    <span className="font-medium">{downloadMessage}</span>
                   </div>
                 </CardContent>
               </Card>

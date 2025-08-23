@@ -51,6 +51,11 @@ export class BiasAnalyzer {
         examples: ['all men are', 'women are emotional', 'male-dominated field'],
         suggestions: ['Use gender-neutral language', 'Focus on individual capabilities', 'Avoid gender stereotypes']
       },
+      'gender_stereotyping': {
+        description: 'Language that stereotypes or discriminates based on gender',
+        examples: ['all men are', 'women are emotional', 'male-dominated field'],
+        suggestions: ['Use gender-neutral language', 'Focus on individual capabilities', 'Avoid gender stereotypes']
+      },
       'racial_bias': {
         description: 'Language that stereotypes or discriminates based on race or ethnicity',
         examples: ['people from that background', 'typical of their culture', 'ethnic group tendencies'],
@@ -66,7 +71,17 @@ export class BiasAnalyzer {
         examples: ['proves my point', 'as expected', 'this confirms what I thought'],
         suggestions: ['Consider multiple perspectives', 'Present balanced viewpoints', 'Acknowledge alternative opinions']
       },
+      'confirmation': {
+        description: 'Language that reinforces existing beliefs without considering alternatives',
+        examples: ['proves my point', 'as expected', 'this confirms what I thought'],
+        suggestions: ['Consider multiple perspectives', 'Present balanced viewpoints', 'Acknowledge alternative opinions']
+      },
       'anchoring_bias': {
+        description: 'Language that relies too heavily on first impressions or initial information',
+        examples: ['my first impression', 'initial assessment', 'first glance suggests'],
+        suggestions: ['Consider multiple data points', 'Re-evaluate initial judgments', 'Look for additional evidence']
+      },
+      'anchoring': {
         description: 'Language that relies too heavily on first impressions or initial information',
         examples: ['my first impression', 'initial assessment', 'first glance suggests'],
         suggestions: ['Consider multiple data points', 'Re-evaluate initial judgments', 'Look for additional evidence']
@@ -86,6 +101,11 @@ export class BiasAnalyzer {
         examples: ['stupid', 'terrible', 'awful', 'hate'],
         suggestions: ['Use constructive language', 'Focus on solutions', 'Maintain professional tone']
       },
+      'toxic_language': {
+        description: 'Language that is harmful, offensive, or creates a hostile environment',
+        examples: ['stupid', 'terrible', 'awful', 'hate'],
+        suggestions: ['Use constructive language', 'Focus on solutions', 'Maintain professional tone']
+      },
       'cultural_bias': {
         description: 'Language that assumes one cultural perspective is universal',
         examples: ['normal way of doing things', 'standard approach', 'common sense'],
@@ -95,6 +115,11 @@ export class BiasAnalyzer {
         description: 'Language that discriminates based on educational background',
         examples: ['from prestigious universities', 'better educated people', 'academic background'],
         suggestions: ['Focus on skills and experience', 'Avoid educational assumptions', 'Value diverse backgrounds']
+      },
+      'generalization': {
+        description: 'Language that makes broad generalizations without evidence',
+        examples: ['always', 'never', 'everyone', 'nobody'],
+        suggestions: ['Use specific examples', 'Avoid absolute statements', 'Provide evidence for claims']
       }
     };
     
@@ -120,25 +145,32 @@ export class BiasAnalyzer {
     const lowerText = text.toLowerCase();
     
     // High severity indicators
-    if (biasType === 'toxic' && (lowerText.includes('hate') || lowerText.includes('kill') || lowerText.includes('stupid'))) {
-      return 'high';
+    if (biasType === 'toxic' || biasType === 'toxic_language') {
+      if (lowerText.includes('hate') || lowerText.includes('kill') || lowerText.includes('stupid')) {
+        return 'high';
+      }
     }
     
-    if (biasType === 'gender_bias' && (lowerText.includes('all men') || lowerText.includes('all women'))) {
-      return 'high';
+    if (biasType === 'gender_bias' || biasType === 'gender_stereotyping') {
+      if (lowerText.includes('all men') || lowerText.includes('all women')) {
+        return 'high';
+      }
     }
     
-    if (biasType === 'racial_bias' && (lowerText.includes('race') || lowerText.includes('ethnic'))) {
-      return 'high';
+    if (biasType === 'racial_bias' || biasType === 'cultural_bias') {
+      if (lowerText.includes('race') || lowerText.includes('ethnic')) {
+        return 'high';
+      }
     }
     
     // Medium severity indicators
-    if (biasType === 'stereotyping' || biasType === 'groupthink') {
+    if (biasType === 'stereotyping' || biasType === 'groupthink' || biasType === 'generalization') {
       return 'medium';
     }
     
     // Low severity indicators
-    if (biasType === 'confirmation_bias' || biasType === 'anchoring_bias') {
+    if (biasType === 'confirmation_bias' || biasType === 'confirmation' || 
+        biasType === 'anchoring_bias' || biasType === 'anchoring') {
       return 'low';
     }
     
@@ -168,19 +200,19 @@ export class BiasAnalyzer {
   private static generateSuggestions(biases: BiasAnalysisResult['biases']): string[] {
     const suggestions: string[] = [];
     
-    if (biases.some(b => b.type === 'gender_bias')) {
+    if (biases.some(b => b.type === 'gender_bias' || b.type === 'gender_stereotyping')) {
       suggestions.push('Use gender-neutral pronouns and language');
     }
     
-    if (biases.some(b => b.type === 'stereotyping')) {
+    if (biases.some(b => b.type === 'stereotyping' || b.type === 'generalization')) {
       suggestions.push('Focus on individual characteristics rather than group generalizations');
     }
     
-    if (biases.some(b => b.type === 'toxic')) {
+    if (biases.some(b => b.type === 'toxic' || b.type === 'toxic_language')) {
       suggestions.push('Replace negative language with constructive alternatives');
     }
     
-    if (biases.some(b => b.type === 'confirmation_bias')) {
+    if (biases.some(b => b.type === 'confirmation_bias' || b.type === 'confirmation')) {
       suggestions.push('Present balanced viewpoints and consider alternative perspectives');
     }
     
@@ -202,6 +234,7 @@ export class BiasAnalyzer {
     biases.forEach(bias => {
       switch (bias.type) {
         case 'gender_bias':
+        case 'gender_stereotyping':
           improvedText = improvedText
             .replace(/all men are/gi, 'some people are')
             .replace(/all women are/gi, 'some people are')
@@ -210,6 +243,7 @@ export class BiasAnalyzer {
           break;
           
         case 'stereotyping':
+        case 'generalization':
           improvedText = improvedText
             .replace(/all \w+ are/gi, 'some people are')
             .replace(/every \w+ is/gi, 'some people are')
@@ -217,6 +251,7 @@ export class BiasAnalyzer {
           break;
           
         case 'toxic':
+        case 'toxic_language':
           improvedText = improvedText
             .replace(/stupid/gi, 'challenging')
             .replace(/terrible/gi, 'difficult')
@@ -232,6 +267,7 @@ export class BiasAnalyzer {
           break;
           
         case 'confirmation_bias':
+        case 'confirmation':
           improvedText = improvedText
             .replace(/proves my point/gi, 'supports this view')
             .replace(/as expected/gi, 'as anticipated')
