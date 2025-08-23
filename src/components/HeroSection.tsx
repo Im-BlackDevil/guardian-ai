@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useState } from "react";
 import RealTimeBiasBot from "./RealTimeBiasBot";
+import { Link } from "react-router-dom";
 
 const HeroSection = () => {
   const [showDemo, setShowDemo] = useState(false);
@@ -109,10 +110,12 @@ const HeroSection = () => {
             </p>
             
             <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center px-4">
-              <Button size="lg" className="text-sm sm:text-base lg:text-lg px-5 sm:px-6 lg:px-8 py-3 sm:py-4 lg:py-6 w-full sm:w-auto h-12 sm:h-14">
-                <Upload className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
-                Upload Text / Document
-              </Button>
+              <Link to="/upload">
+                <Button size="lg" className="text-sm sm:text-base lg:text-lg px-5 sm:px-6 lg:px-8 py-3 sm:py-4 lg:py-6 w-full sm:w-auto h-12 sm:h-14">
+                  <Upload className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
+                  Upload Your Document
+                </Button>
+              </Link>
               <Button 
                 variant="outline" 
                 size="lg" 
@@ -170,12 +173,16 @@ const HeroSection = () => {
                 and objective communication environments.
               </p>
               <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 lg:gap-4 justify-center">
-                <Button variant="outline" size="lg" className="w-full sm:w-auto h-10 sm:h-12">
-                  Explore Integrations
-                </Button>
-                <Button variant="outline" size="lg" className="w-full sm:w-auto h-10 sm:h-12">
-                  Learn More
-                </Button>
+                <Link to="/upload">
+                  <Button variant="outline" size="lg" className="w-full sm:w-auto h-10 sm:h-12">
+                    Try Bias Analyzer
+                  </Button>
+                </Link>
+                <Link to="/integrations">
+                  <Button variant="outline" size="lg" className="w-full sm:w-auto h-10 sm:h-12">
+                    Explore Integrations
+                  </Button>
+                </Link>
               </div>
             </Card>
           </motion.div>

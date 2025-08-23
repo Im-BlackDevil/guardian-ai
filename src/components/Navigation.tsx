@@ -10,7 +10,7 @@ const Navigation = () => {
   
   const navigationItems = [
     { name: "Dashboard", path: "/dashboard" },
-    { name: "Real-Time Bot", path: "/realtime-bot" },
+    // { name: "Real-Time Bot", path: "/realtime-bot" },
     { name: "Bias Engine", path: "/bias-engine" },
     { name: "Integrations", path: "/integrations" },
     { name: "Reports", path: "/reports" },
