@@ -17,11 +17,11 @@ const Footer = () => {
       transition={{ duration: 0.8 }}
       className="border-t border-border bg-card/50 backdrop-blur-sm"
     >
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+      <div className="container mx-auto px-3 sm:px-6 lg:px-8 py-6 sm:py-8 lg:py-12">
         <div className="flex flex-col md:flex-row items-center justify-between">
-          {/* Logo and Tagline */}
+          {/* Logo and Tagline - More compact */}
           <motion.div
-            className="flex flex-col md:flex-row items-center mb-6 md:mb-0"
+            className="flex flex-col md:flex-row items-center mb-4 sm:mb-6 md:mb-0"
             whileHover={{ scale: 1.05 }}
             transition={{ type: "spring", stiffness: 400, damping: 10 }}
           >
@@ -39,8 +39,8 @@ const Footer = () => {
             </div>
           </motion.div>
 
-          {/* Links */}
-          <div className="flex items-center space-x-4 sm:space-x-8">
+          {/* Links - More compact spacing */}
+          <div className="flex items-center space-x-3 sm:space-x-4 lg:space-x-8">
             {footerLinks.map((link, index) => (
               <motion.a
                 key={link.name}
@@ -59,15 +59,15 @@ const Footer = () => {
           </div>
         </div>
 
-        {/* Divider */}
+        {/* Divider - More compact */}
         <motion.div
-          className="border-t border-border my-6 sm:my-8"
+          className="border-t border-border my-4 sm:my-6 lg:my-8"
           initial={{ scaleX: 0 }}
           animate={{ scaleX: 1 }}
           transition={{ duration: 0.8, delay: 0.4 }}
         />
 
-        {/* Copyright and Version */}
+        {/* Copyright and Version - More compact */}
         <motion.div
           className="flex flex-col md:flex-row items-center justify-between text-xs sm:text-sm text-muted-foreground"
           initial={{ opacity: 0 }}

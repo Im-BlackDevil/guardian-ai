@@ -355,215 +355,215 @@ const RealTimeBiasBot = () => {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.8 }}
-      className="py-8 sm:py-12 lg:py-16 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-primary/5 via-accent/5 to-primary/5"
+      className="py-6 sm:py-8 lg:py-16 px-3 sm:px-6 lg:px-8 bg-gradient-to-br from-primary/5 via-accent/5 to-primary/5"
     >
       <div className="container mx-auto max-w-6xl">
         <motion.div
           initial={{ y: 30, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ duration: 0.6 }}
-          className="text-center mb-8 sm:mb-12"
+          className="text-center mb-6 sm:mb-8 lg:mb-12"
         >
-          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-3 sm:mb-4 px-2">Real-Time Bias Detection Bot</h2>
-          <p className="text-lg sm:text-xl text-muted-foreground px-4">
+          <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold mb-2 sm:mb-3 lg:mb-4 px-2">Real-Time Bias Detection Bot</h2>
+          <p className="text-sm sm:text-lg sm:text-xl text-muted-foreground px-4 max-w-2xl mx-auto">
             Experience live bias detection as you type. This simulates how BiasShield AI works in real chat platforms.
           </p>
         </motion.div>
 
-        <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 sm:gap-8">
-          {/* Chat Interface */}
+        {/* Mobile-First Layout: Stack vertically on mobile, side-by-side on larger screens */}
+        <div className="space-y-4 sm:space-y-6 lg:space-y-0 lg:grid lg:grid-cols-1 xl:grid-cols-3 lg:gap-6 xl:gap-8">
+          {/* Chat Interface - Full width on mobile, 2/3 on desktop */}
           <motion.div
             initial={{ x: -50, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
             transition={{ duration: 0.6, delay: 0.2 }}
-            className="xl:col-span-2"
+            className="lg:col-span-2"
           >
-                         <Card className="shadow-card h-[500px] sm:h-[550px] lg:h-[600px] flex flex-col overflow-hidden">
-                           <CardHeader className="border-b border-border flex-shrink-0 p-4 sm:p-6">
-                             <CardTitle className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-0">
-                               <div className="flex items-center">
-                                 <MessageSquare className="h-4 w-4 sm:h-5 sm:w-5 mr-2 text-primary" />
-                                 <span className="text-base sm:text-lg">Live Chat Simulation</span>
-                               </div>
-                               <Badge variant="outline" className="bg-success/10 text-success border-success/20 text-xs sm:text-sm">
-                                 <Bot className="h-3 w-3 mr-1" />
-                                 AI Active
-                               </Badge>
-                             </CardTitle>
-                           </CardHeader>
-                           
-                           <CardContent className="flex-1 flex flex-col p-0 min-h-0">
-                             {/* Messages Area - Fixed height with proper scrolling */}
-                             <div className="flex-1 overflow-y-auto p-3 sm:p-4 space-y-3 sm:space-y-4 min-h-0">
-                               {messages.map((message) => (
-                                 <motion.div
-                                   key={message.id}
-                                   initial={{ opacity: 0, y: 20 }}
-                                   animate={{ opacity: 1, y: 0 }}
-                                   className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'} mb-3 sm:mb-4`}
-                                 >
-                                   <div className={`max-w-[85%] sm:max-w-[80%] ${message.sender === 'user' ? 'order-2' : 'order-1'}`}>
-                                     <div className={`rounded-lg p-2 sm:p-3 ${
-                                       message.sender === 'user' 
-                                         ? 'bg-primary text-primary-foreground' 
-                                         : 'bg-muted'
-                                     }`}>
-                                       <div className="text-xs sm:text-sm whitespace-pre-wrap break-words">{message.text}</div>
-                                       <div className={`text-xs mt-1 sm:mt-2 ${
-                                         message.sender === 'user' ? 'text-primary-foreground/70' : 'text-muted-foreground'
-                                       }`}>
-                                         {message.timestamp.toLocaleTimeString()}
-                                       </div>
-                                     </div>
-                                     
-                                     {/* Bias Detection Badge */}
-                                     {message.biasAnalysis && (
-                                       <motion.div
-                                         initial={{ scale: 0.8, opacity: 0 }}
-                                         animate={{ scale: 1, opacity: 1 }}
-                                         className={`mt-2 flex items-center space-x-2 ${getSeverityColor(message.biasAnalysis.overallRisk)} px-2 sm:px-3 py-1 sm:py-2 rounded-md border max-w-full`}
-                                       >
-                                         {getSeverityIcon(message.biasAnalysis.overallRisk)}
-                                         <span className="text-xs font-medium truncate">{message.biasAnalysis.overallRisk.toUpperCase()}</span>
-                                       </motion.div>
-                                     )}
-                                   </div>
-                                 </motion.div>
-                               ))}
-                               
-                               {/* Analyzing indicator */}
-                               {isAnalyzing && (
-                                 <motion.div
-                                   initial={{ opacity: 0, scale: 0.8 }}
-                                   animate={{ opacity: 1, scale: 1 }}
-                                   className="flex justify-start mb-3 sm:mb-4"
-                                 >
-                                   <div className="bg-muted rounded-lg p-2 sm:p-3 max-w-[85%] sm:max-w-[80%]">
-                                     <div className="flex items-center space-x-2">
-                                       <motion.div
-                                         animate={{ rotate: 360 }}
-                                         transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                                       >
-                                         <Zap className="h-3 w-3 sm:h-4 sm:w-4 text-primary" />
-                                       </motion.div>
-                                       <span className="text-xs sm:text-sm text-muted-foreground">Analyzing for biases...</span>
-                                     </div>
-                                   </div>
-                                 </motion.div>
-                               )}
-                               
-                               {/* Demo analyzing indicator */}
-                               {isDemoRunning && (
-                                 <motion.div
-                                   initial={{ opacity: 0, scale: 0.8 }}
-                                   animate={{ opacity: 1, scale: 1 }}
-                                   className="flex justify-start mb-3 sm:mb-4"
-                                 >
-                                   <div className="bg-primary/10 border border-primary/20 rounded-lg p-2 sm:p-3 max-w-[85%] sm:max-w-[80%]">
-                                     <div className="flex items-center space-x-2">
-                                       <motion.div
-                                         animate={{ rotate: 360 }}
-                                         transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                                       >
-                                         <Bot className="h-3 w-3 sm:h-4 sm:w-4 text-primary" />
-                                       </motion.div>
-                                       <span className="text-xs sm:text-sm text-primary font-medium">Analyzing demo message...</span>
-                                     </div>
-                                   </div>
-                                 </motion.div>
-                               )}
-                               
-                               {/* Scroll anchor */}
-                               <div ref={messagesEndRef} className="h-0" />
-                             </div>
-                           
-                             {/* Input Area - Fixed at bottom */}
-                             <div className="border-t border-border p-3 sm:p-4 flex-shrink-0">
-                               <div className="flex space-x-2">
-                                 <Input
-                                   value={inputText}
-                                   onChange={(e) => setInputText(e.target.value)}
-                                   onKeyPress={handleKeyPress}
-                                   placeholder="Type a message to test bias detection..."
-                                   className="flex-1 text-sm sm:text-base"
-                                   disabled={isAnalyzing}
-                                 />
-                                 <Button 
-                                   onClick={handleSendMessage} 
-                                   disabled={!inputText.trim() || isAnalyzing}
-                                   size="sm"
-                                   className="px-3 sm:px-4"
-                                 >
-                                   <Send className="h-3 w-3 sm:h-4 sm:w-4" />
-                                 </Button>
-                               </div>
-                               <p className="text-xs text-muted-foreground mt-2 leading-relaxed">
-                                 Try phrases like "Everyone agrees with this" or "This guy is from IIT, he'll be better", or click "Demo Chat" for a random bias example
-                               </p>
-                             </div>
-                           </CardContent>
-                         </Card>
+            <Card className="shadow-card h-[400px] sm:h-[450px] lg:h-[500px] xl:h-[600px] flex flex-col overflow-hidden">
+              <CardHeader className="border-b border-border flex-shrink-0 p-3 sm:p-4 lg:p-6">
+                <CardTitle className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-0">
+                  <div className="flex items-center">
+                    <MessageSquare className="h-4 w-4 sm:h-5 sm:w-5 mr-2 text-primary" />
+                    <span className="text-sm sm:text-base lg:text-lg">Live Chat Simulation</span>
+                  </div>
+                  <Badge variant="outline" className="bg-success/10 text-success border-success/20 text-xs sm:text-sm">
+                    <Bot className="h-3 w-3 mr-1" />
+                    AI Active
+                  </Badge>
+                </CardTitle>
+              </CardHeader>
+              
+              <CardContent className="flex-1 flex flex-col p-0 min-h-0">
+                {/* Messages Area - More compact on mobile */}
+                <div className="flex-1 overflow-y-auto p-2 sm:p-3 lg:p-4 space-y-2 sm:space-y-3 lg:space-y-4 min-h-0">
+                  {messages.map((message) => (
+                    <motion.div
+                      key={message.id}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'} mb-2 sm:mb-3 lg:mb-4`}
+                    >
+                      <div className={`max-w-[90%] sm:max-w-[85%] lg:max-w-[80%] ${message.sender === 'user' ? 'order-2' : 'order-1'}`}>
+                        <div className={`rounded-lg p-2 sm:p-3 ${
+                          message.sender === 'user' 
+                            ? 'bg-primary text-primary-foreground' 
+                            : 'bg-muted'
+                        }`}>
+                          <div className="text-xs sm:text-sm whitespace-pre-wrap break-words leading-relaxed">{message.text}</div>
+                          <div className={`text-xs mt-1 sm:mt-2 ${
+                            message.sender === 'user' ? 'text-primary-foreground/70' : 'text-muted-foreground'
+                          }`}>
+                            {message.timestamp.toLocaleTimeString()}
+                          </div>
+                        </div>
+                        
+                        {/* Bias Detection Badge - More compact on mobile */}
+                        {message.biasAnalysis && (
+                          <motion.div
+                            initial={{ scale: 0.8, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            className={`mt-1 sm:mt-2 flex items-center space-x-1 sm:space-x-2 ${getSeverityColor(message.biasAnalysis.overallRisk)} px-2 py-1 sm:px-3 sm:py-2 rounded-md border max-w-full`}
+                          >
+                            {getSeverityIcon(message.biasAnalysis.overallRisk)}
+                            <span className="text-xs font-medium truncate">{message.biasAnalysis.overallRisk.toUpperCase()}</span>
+                          </motion.div>
+                        )}
+                      </div>
+                    </motion.div>
+                  ))}
+                  
+                  {/* Analyzing indicators - More compact */}
+                  {isAnalyzing && (
+                    <motion.div
+                      initial={{ opacity: 0, scale: 0.8 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      className="flex justify-start mb-2 sm:mb-3 lg:mb-4"
+                    >
+                      <div className="bg-muted rounded-lg p-2 sm:p-3 max-w-[90%] sm:max-w-[85%] lg:max-w-[80%]">
+                        <div className="flex items-center space-x-2">
+                          <motion.div
+                            animate={{ rotate: 360 }}
+                            transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                          >
+                            <Zap className="h-3 w-3 sm:h-4 sm:w-4 text-primary" />
+                          </motion.div>
+                          <span className="text-xs sm:text-sm text-muted-foreground">Analyzing for biases...</span>
+                        </div>
+                      </div>
+                    </motion.div>
+                  )}
+                  
+                  {isDemoRunning && (
+                    <motion.div
+                      initial={{ opacity: 0, scale: 0.8 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      className="flex justify-start mb-2 sm:mb-3 lg:mb-4"
+                    >
+                      <div className="bg-primary/10 border border-primary/20 rounded-lg p-2 sm:p-3 max-w-[90%] sm:max-w-[85%] lg:max-w-[80%]">
+                        <div className="flex items-center space-x-2">
+                          <motion.div
+                            animate={{ rotate: 360 }}
+                            transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                          >
+                            <Bot className="h-3 w-3 sm:h-4 sm:w-4 text-primary" />
+                          </motion.div>
+                          <span className="text-xs sm:text-sm text-primary font-medium">Analyzing demo message...</span>
+                        </div>
+                      </div>
+                    </motion.div>
+                  )}
+                  
+                  {/* Scroll anchor */}
+                  <div ref={messagesEndRef} className="h-0" />
+                </div>
+              
+                {/* Input Area - More compact on mobile */}
+                <div className="border-t border-border p-2 sm:p-3 lg:p-4 flex-shrink-0">
+                  <div className="flex space-x-2">
+                    <Input
+                      value={inputText}
+                      onChange={(e) => setInputText(e.target.value)}
+                      onKeyPress={handleKeyPress}
+                      placeholder="Type a message to test bias detection..."
+                      className="flex-1 text-xs sm:text-sm lg:text-base"
+                      disabled={isAnalyzing}
+                    />
+                    <Button 
+                      onClick={handleSendMessage} 
+                      disabled={!inputText.trim() || isAnalyzing}
+                      size="sm"
+                      className="px-2 sm:px-3 lg:px-4"
+                    >
+                      <Send className="h-3 w-3 sm:h-4 sm:w-4" />
+                    </Button>
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-1 sm:mt-2 leading-relaxed">
+                    Try phrases like "Everyone agrees with this" or "This guy is from IIT, he'll be better", or click "Demo Chat" for a random bias example
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
           </motion.div>
 
-          {/* Bias Statistics */}
+          {/* Bias Statistics - Compact card on mobile, full height on desktop */}
           <motion.div
             initial={{ x: 50, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
             transition={{ duration: 0.6, delay: 0.4 }}
-            className="xl:col-span-1"
+            className="lg:col-span-1"
           >
-            <Card className="shadow-card h-[500px] sm:h-[550px] lg:h-[600px]">
-              <CardHeader className="p-4 sm:p-6">
-                <CardTitle className="flex items-center text-base sm:text-lg">
+            <Card className="shadow-card h-[300px] sm:h-[350px] lg:h-[500px] xl:h-[600px]">
+              <CardHeader className="p-3 sm:p-4 lg:p-6">
+                <CardTitle className="flex items-center text-sm sm:text-base lg:text-lg">
                   <Shield className="h-4 w-4 sm:h-5 sm:w-5 mr-2 text-primary" />
                   Bias Scorecard
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4 sm:space-y-6 p-4 sm:p-6">
-                {/* Total Biases */}
+              <CardContent className="space-y-3 sm:space-y-4 lg:space-y-6 p-3 sm:p-4 lg:p-6">
+                {/* Total Biases - More prominent on mobile */}
                 <div className="text-center">
-                  <div className="text-2xl sm:text-3xl font-bold text-primary mb-1">{biasStats.total}</div>
+                  <div className="text-2xl sm:text-3xl lg:text-3xl font-bold text-primary mb-1">{biasStats.total}</div>
                   <div className="text-xs sm:text-sm text-muted-foreground">Total Biases Detected</div>
                 </div>
                 
-                {/* Bias Breakdown */}
-                <div className="space-y-3 sm:space-y-4">
-                  <div className="flex items-center justify-between">
+                {/* Bias Breakdown - Compact grid on mobile */}
+                <div className="grid grid-cols-2 gap-2 sm:gap-3 lg:gap-4">
+                  <div className="flex items-center justify-between p-2 bg-muted/30 rounded-lg">
                     <span className="text-xs sm:text-sm">Groupthink</span>
                     <Badge variant="outline" className="bg-warning/10 text-warning border-warning/20 text-xs">
                       {biasStats.groupthink}
                     </Badge>
                   </div>
                   
-                  <div className="flex items-center justify-between">
+                  <div className="flex items-center justify-between p-2 bg-muted/30 rounded-lg">
                     <span className="text-xs sm:text-sm">Anchoring</span>
                     <Badge variant="outline" className="bg-success/10 text-success border-success/20 text-xs">
                       {biasStats.anchoring}
                     </Badge>
                   </div>
                   
-                  <div className="flex items-center justify-between">
+                  <div className="flex items-center justify-between p-2 bg-muted/30 rounded-lg">
                     <span className="text-xs sm:text-sm">Gender/Cultural</span>
                     <Badge variant="outline" className="bg-destructive/10 text-destructive border-destructive/20 text-xs">
                       {biasStats.genderCultural}
                     </Badge>
                   </div>
                   
-                  <div className="flex items-center justify-between">
+                  <div className="flex items-center justify-between p-2 bg-muted/30 rounded-lg">
                     <span className="text-xs sm:text-sm">Toxic Tone</span>
                     <Badge variant="outline" className="bg-destructive/10 text-destructive border-destructive/20 text-xs">
                       {biasStats.toxic}
                     </Badge>
                   </div>
                   
-                  <div className="flex items-center justify-between">
+                  <div className="flex items-center justify-between p-2 bg-muted/30 rounded-lg">
                     <span className="text-xs sm:text-sm">Confirmation</span>
                     <Badge variant="outline" className="bg-warning/10 text-warning border-warning/20 text-xs">
                       {biasStats.confirmation}
                     </Badge>
                   </div>
                   
-                  <div className="flex items-center justify-between">
+                  <div className="flex items-center justify-between p-2 bg-muted/30 rounded-lg">
                     <span className="text-xs sm:text-sm">Stereotyping</span>
                     <Badge variant="outline" className="bg-destructive/10 text-destructive border-destructive/20 text-xs">
                       {biasStats.stereotyping}
@@ -571,66 +571,66 @@ const RealTimeBiasBot = () => {
                   </div>
                 </div>
                 
-                {/* Quick Actions */}
-                <div className="space-y-2 sm:space-y-3 pt-3 sm:pt-4 border-t border-border">
-                                     <Button 
-                     variant="outline" 
-                     size="sm" 
-                     className="w-full text-xs sm:text-sm"
-                                           onClick={() => {
-                        setMessages([{
-                          id: '1',
-                          text: "Welcome to BiasShield AI! I'm here to help detect biases in real-time using advanced AI analysis. Try typing something that might contain bias...",
-                          sender: 'bot',
-                          timestamp: new Date()
-                        }]);
-                        setBiasStats({
-                          total: 0,
-                          groupthink: 0,
-                          anchoring: 0,
-                          genderCultural: 0,
-                          toxic: 0,
-                          confirmation: 0,
-                          stereotyping: 0
-                        });
-                        setInputText('');
-                        setIsAnalyzing(false);
-                        setIsDemoRunning(false);
-                      }}
-                     disabled={isDemoRunning}
-                   >
-                     Reset Chat
-                   </Button>
+                {/* Quick Actions - Compact buttons */}
+                <div className="space-y-2 sm:space-y-3 pt-2 sm:pt-3 lg:pt-4 border-t border-border">
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="w-full text-xs sm:text-sm h-8 sm:h-9"
+                    onClick={() => {
+                      setMessages([{
+                        id: '1',
+                        text: "Welcome to BiasShield AI! I'm here to help detect biases in real-time using advanced AI analysis. Try typing something that might contain bias...",
+                        sender: 'bot',
+                        timestamp: new Date()
+                      }]);
+                      setBiasStats({
+                        total: 0,
+                        groupthink: 0,
+                        anchoring: 0,
+                        genderCultural: 0,
+                        toxic: 0,
+                        confirmation: 0,
+                        stereotyping: 0
+                      });
+                      setInputText('');
+                      setIsAnalyzing(false);
+                      setIsDemoRunning(false);
+                    }}
+                    disabled={isDemoRunning}
+                  >
+                    Reset Chat
+                  </Button>
                   
-                                     <Button 
-                     variant="outline" 
-                     size="sm" 
-                     className="w-full text-xs sm:text-sm"
-                     onClick={demoChat}
-                     disabled={isDemoRunning}
-                   >
-                     {isDemoRunning ? 'Analyzing...' : 'Demo Chat'}
-                   </Button>
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="w-full text-xs sm:text-sm h-8 sm:h-9"
+                    onClick={demoChat}
+                    disabled={isDemoRunning}
+                  >
+                    {isDemoRunning ? 'Analyzing...' : 'Demo Chat'}
+                  </Button>
                 </div>
               </CardContent>
             </Card>
           </motion.div>
         </div>
 
-        {/* Integration Info */}
+        {/* Integration Info - More compact on mobile */}
         <motion.div
           initial={{ y: 30, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ duration: 0.6, delay: 0.6 }}
-          className="mt-8 sm:mt-12 text-center"
+          className="mt-6 sm:mt-8 lg:mt-12 text-center"
         >
           <Card className="shadow-card border-primary/20 bg-gradient-to-r from-primary/5 to-accent/5">
             <CardContent className="p-4 sm:p-6">
-              <h3 className="text-lg sm:text-xl font-semibold mb-2 sm:mb-3">Ready for Real Integration?</h3>
-              <p className="text-muted-foreground mb-3 sm:mb-4 text-sm sm:text-base">
+              <h3 className="text-base sm:text-lg lg:text-xl font-semibold mb-2 sm:mb-3">Ready for Real Integration?</h3>
+              <p className="text-muted-foreground mb-3 sm:mb-4 text-xs sm:text-sm lg:text-base">
                 This demo shows how BiasShield AI would work in Discord, Slack, Microsoft Teams, and other chat platforms.
               </p>
-              <div className="flex flex-wrap justify-center gap-2 sm:gap-4">
+              <div className="grid grid-cols-2 sm:flex sm:flex-wrap justify-center gap-2 sm:gap-4">
                 <Badge variant="outline" className="px-2 sm:px-3 py-1 text-xs sm:text-sm">Discord Bot</Badge>
                 <Badge variant="outline" className="px-2 sm:px-3 py-1 text-xs sm:text-sm">Slack Integration</Badge>
                 <Badge variant="outline" className="px-2 sm:px-3 py-1 text-xs sm:text-sm">Teams Webhook</Badge>
