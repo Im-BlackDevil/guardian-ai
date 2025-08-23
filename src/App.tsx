@@ -28,7 +28,7 @@ function App() {
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/Try Live Demo" element={<RealTimeBot />} />
+              <Route path="/try-live-demo" element={<RealTimeBot />} />
               <Route path="/bias-engine" element={<BiasEngine />} />
               <Route path="/integrations" element={<Integrations />} />
               <Route path="/reports" element={<Reports />} />

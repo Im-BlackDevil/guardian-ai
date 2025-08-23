@@ -6,6 +6,10 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { useState, useRef, useEffect } from "react";
 import { biasDetectionService, BiasAnalysis, TextAnalysis } from "@/lib/biasDetectionService";
+import { detectBiasRules } from "../utils/biasRules";
+import { detectBiasML } from "../utils/mlBias";
+// import { aiBiasDetector } from "../utils/aibiasDetection";
+
 
 interface ChatMessage {
   id: string;
@@ -84,39 +88,44 @@ const RealTimeBiasBot = () => {
     setIsAnalyzing(true);
     
     try {
-      // Use the advanced bias detection service
-      const analysis = await biasDetectionService.analyzeText(inputText);
+      // Use both rule-based and ML-based bias detection
+      const rules = detectBiasRules(inputText);
+      const ml = await detectBiasML(inputText);
       
-      if (analysis.biases.length > 0) {
+      console.log("Rule-based bias:", rules);
+      console.log("ML-based bias:", ml);
+      
+      // Determine if bias is detected based on our functions
+      const hasBias = rules.length > 0 || ml.length > 0;
+      
+      if (hasBias) {
         // Update bias statistics
         setBiasStats(prev => ({
           total: prev.total + 1,
-          groupthink: prev.groupthink + (analysis.biases.some(b => b.type.includes('Groupthink')) ? 1 : 0),
-          anchoring: prev.anchoring + (analysis.biases.some(b => b.type.includes('Anchoring')) ? 1 : 0),
-          genderCultural: prev.genderCultural + (analysis.biases.some(b => b.type.includes('Gender/Cultural')) ? 1 : 0),
-          toxic: prev.toxic + (analysis.biases.some(b => b.type.includes('Toxic')) ? 1 : 0),
-          confirmation: prev.confirmation + (analysis.biases.some(b => b.type.includes('Confirmation')) ? 1 : 0),
-          stereotyping: prev.stereotyping + (analysis.biases.some(b => b.type.includes('Stereotyping')) ? 1 : 0)
+          groupthink: prev.groupthink + (ml.includes('groupthink') ? 1 : 0),
+          anchoring: prev.anchoring + (ml.includes('anchoring') ? 1 : 0),
+          genderCultural: prev.genderCultural + (ml.includes('gender_bias') || ml.includes('cultural_bias') ? 1 : 0),
+          toxic: prev.toxic + (ml.includes('toxic') ? 1 : 0),
+          confirmation: prev.confirmation + (ml.includes('confirmation') ? 1 : 0),
+          stereotyping: prev.stereotyping + (ml.includes('stereotyping') ? 1 : 0)
         }));
         
-        // Add detailed bias analysis message
+        // Short and precise bias detection message
         const botMessage: ChatMessage = {
           id: (Date.now() + 1).toString(),
-          text: `🚨 **Bias Detection Results**\n\n**Overall Risk:** ${analysis.overallRisk.toUpperCase()}\n**Toxicity Score:** ${(analysis.toxicityScore * 100).toFixed(0)}%\n**Processing Time:** ${analysis.processingTime}ms\n\n**Detected Biases:**\n${analysis.biases.map(bias => `• ${bias.type} (${bias.confidence * 100}% confidence, ${bias.severity} severity)`).join('\n')}\n\n**Recommendations:**\n${analysis.recommendations.map(rec => `• ${rec}`).join('\n')}`,
+          text: `🚨 **Bias Detected!**\n\n**🔍 Bias Type:** ${getBiasTypeDisplay(rules, ml)}\n\n**⚠️ Warning:** ${getWarningMessage(rules, ml)}\n\n**💡 Recommended:** ${getRecommendedSentence(inputText, rules, ml)}`,
           sender: 'bot',
-          timestamp: new Date(),
-          biasAnalysis: analysis
+          timestamp: new Date()
         };
         
         setMessages(prev => [...prev, botMessage]);
       } else {
-        // Add confirmation message
+        // Short confirmation message
         const botMessage: ChatMessage = {
           id: (Date.now() + 1).toString(),
-          text: `✅ **No Biases Detected**\n\n**Overall Risk:** ${analysis.overallRisk.toUpperCase()}\n**Toxicity Score:** ${(analysis.toxicityScore * 100).toFixed(0)}%\n**Processing Time:** ${analysis.processingTime}ms\n\n**Analysis:** Your message appears to be bias-free and professional.\n\n**Recommendations:**\n${analysis.recommendations.map(rec => `• ${rec}`).join('\n')}`,
+          text: `✅ **No Bias Detected**\n\nYour message appears to be bias-free and professional.`,
           sender: 'bot',
-          timestamp: new Date(),
-          biasAnalysis: analysis
+          timestamp: new Date()
         };
         
         setMessages(prev => [...prev, botMessage]);
@@ -125,7 +134,7 @@ const RealTimeBiasBot = () => {
       console.error('Bias detection error:', error);
       const errorMessage: ChatMessage = {
         id: (Date.now() + 1).toString(),
-        text: '❌ **Analysis Error**\n\nSorry, there was an error analyzing your message. Please try again.',
+        text: '❌ **Analysis Error**\n\nPlease try again.',
         sender: 'bot',
         timestamp: new Date()
       };
@@ -179,44 +188,49 @@ const RealTimeBiasBot = () => {
     
     setMessages(prev => [...prev, userMessage]);
     
-    try {
-      // Use the advanced bias detection service
-      const analysis = await biasDetectionService.analyzeText(selectedStatement);
-      
-      if (analysis.biases.length > 0) {
-        // Update bias statistics
-        setBiasStats(prev => ({
-          total: prev.total + 1,
-          groupthink: prev.groupthink + (analysis.biases.some(b => b.type.includes('Groupthink')) ? 1 : 0),
-          anchoring: prev.anchoring + (analysis.biases.some(b => b.type.includes('Anchoring')) ? 1 : 0),
-          genderCultural: prev.genderCultural + (analysis.biases.some(b => b.type.includes('Gender/Cultural')) ? 1 : 0),
-          toxic: prev.toxic + (analysis.biases.some(b => b.type.includes('Toxic')) ? 1 : 0),
-          confirmation: prev.confirmation + (analysis.biases.some(b => b.type.includes('Confirmation')) ? 1 : 0),
-          stereotyping: prev.stereotyping + (analysis.biases.some(b => b.type.includes('Stereotyping')) ? 1 : 0)
-        }));
-        
-        // Add detailed bias analysis message
-        const botMessage: ChatMessage = {
-          id: `demo-bot-${Date.now()}`,
-          text: `🚨 **Demo Analysis Results**\n\n**Overall Risk:** ${analysis.overallRisk.toUpperCase()}\n**Toxicity Score:** ${(analysis.toxicityScore * 100).toFixed(0)}%\n**Processing Time:** ${analysis.processingTime}ms\n\n**Detected Biases:**\n${analysis.biases.map(bias => `• ${bias.type} (${bias.confidence * 100}% confidence, ${bias.severity} severity)`).join('\n')}\n\n**Recommendations:**\n${analysis.recommendations.map(rec => `• ${rec}`).join('\n')}`,
-          sender: 'bot',
-          timestamp: new Date(),
-          biasAnalysis: analysis
-        };
-        
-        setMessages(prev => [...prev, botMessage]);
-      } else {
-        // Add confirmation message
-        const botMessage: ChatMessage = {
-          id: `demo-bot-${Date.now()}`,
-          text: `✅ **Demo Analysis Complete**\n\n**Overall Risk:** ${analysis.overallRisk.toUpperCase()}\n**Toxicity Score:** ${(analysis.toxicityScore * 100).toFixed(0)}%\n**Processing Time:** ${analysis.processingTime}ms\n\n**Analysis:** This demo message appears to be bias-free.\n\n**Recommendations:**\n${analysis.recommendations.map(rec => `• ${rec}`).join('\n')}`,
-          sender: 'bot',
-          timestamp: new Date(),
-          biasAnalysis: analysis
-        };
+              try {
+       // Use both rule-based and ML-based bias detection for demo
+       const rules = detectBiasRules(selectedStatement);
+       const ml = await detectBiasML(selectedStatement);
+       
+       console.log("Demo - Rule-based bias:", rules);
+       console.log("Demo - ML-based bias:", ml);
+       
+       // Determine if bias is detected based on our functions
+       const hasBias = rules.length > 0 || ml.length > 0;
+       
+       if (hasBias) {
+                 // Update bias statistics
+                   setBiasStats(prev => ({
+            total: prev.total + 1,
+            groupthink: prev.groupthink + (ml.includes('groupthink') ? 1 : 0),
+            anchoring: prev.anchoring + (ml.includes('anchoring') ? 1 : 0),
+            genderCultural: prev.genderCultural + (ml.includes('gender_bias') || ml.includes('cultural_bias') ? 1 : 0),
+            toxic: prev.toxic + (ml.includes('toxic') ? 1 : 0),
+            confirmation: prev.confirmation + (ml.includes('confirmation') ? 1 : 0),
+            stereotyping: prev.stereotyping + (ml.includes('stereotyping') ? 1 : 0)
+          }));
+          
+          // Short and precise demo bias detection message
+          const botMessage: ChatMessage = {
+            id: `demo-bot-${Date.now()}`,
+            text: `🚨 **Demo: Bias Detected!**\n\n**🔍 Bias Type:** ${getBiasTypeDisplay(rules, ml)}\n\n**⚠️ Warning:** ${getWarningMessage(rules, ml)}\n\n**💡 Recommended:** ${getRecommendedSentence(selectedStatement, rules, ml)}`,
+            sender: 'bot',
+            timestamp: new Date()
+          };
         
         setMessages(prev => [...prev, botMessage]);
-      }
+             } else {
+         // Short confirmation message for demo
+         const botMessage: ChatMessage = {
+           id: `demo-bot-${Date.now()}`,
+           text: `✅ **Demo: No Bias Detected**\n\nThis demo message appears to be bias-free.`,
+           sender: 'bot',
+           timestamp: new Date()
+         };
+         
+         setMessages(prev => [...prev, botMessage]);
+       }
     } catch (error) {
       console.error('Demo analysis error:', error);
       const errorMessage: ChatMessage = {
@@ -231,6 +245,108 @@ const RealTimeBiasBot = () => {
     }
   };
 
+  // Helper functions for better bias detection messages
+  const getBiasTypeDisplay = (rules: string[], ml: string[]) => {
+    const allTypes = [...new Set([...rules, ...ml])];
+    
+    if (allTypes.length === 0) return "None detected";
+    
+    // Map technical terms to user-friendly names
+    const typeMapping: { [key: string]: string } = {
+      'groupthink': '🤝 Groupthink Bias',
+      'anchoring': '⚓ Anchoring Bias', 
+      'gender_bias': '🚻 Gender Bias',
+      'cultural_bias': '🌍 Cultural Bias',
+      'toxic': '☠️ Toxic Language',
+      'confirmation': '✅ Confirmation Bias',
+      'stereotyping': '🏷️ Stereotyping',
+      'generalization': '📊 Over-Generalization',
+      'everyone': '👥 Group Generalization',
+      'every': '📊 Absolute Statement',
+      'always': '⏰ Absolute Statement',
+      'never': '⏰ Absolute Statement',
+      'finalize': '🔒 Premature Decision',
+      'agrees': '🤝 Assumed Consensus',
+      'stupid': '😤 Insulting Language',
+      'terrible': '😤 Negative Language',
+      'iit': '🎓 Educational Bias',
+      'better': '⭐ Comparative Bias',
+      'women': '👩 Gender Stereotyping',
+      'men': '👨 Gender Stereotyping',
+      'males': '👨 Gender Stereotyping',
+      'females': '👩 Gender Stereotyping'
+    };
+    
+    return allTypes.map(type => typeMapping[type] || type).join(', ');
+  };
+
+  const getWarningMessage = (rules: string[], ml: string[]) => {
+    const allTypes = [...new Set([...rules, ...ml])];
+    
+    if (allTypes.length === 0) return "No bias detected";
+    
+    const warnings: string[] = [];
+    
+    if (allTypes.some(t => t.includes('groupthink') || t.includes('agrees') || t.includes('finalize'))) {
+      warnings.push("This can suppress diverse opinions and lead to poor decision-making");
+    }
+    if (allTypes.some(t => t.includes('stereotyping') || t.includes('women') || t.includes('men') || t.includes('males') || t.includes('females'))) {
+      warnings.push("This reinforces harmful stereotypes and excludes individuals");
+    }
+    if (allTypes.some(t => t.includes('toxic') || t.includes('stupid') || t.includes('terrible'))) {
+      warnings.push("This creates a hostile environment and damages team relationships");
+    }
+    if (allTypes.some(t => t.includes('generalization') || t.includes('everyone') || t.includes('always') || t.includes('never'))) {
+      warnings.push("This oversimplifies complex situations and ignores exceptions");
+    }
+    if (allTypes.some(t => t.includes('iit') || t.includes('better'))) {
+      warnings.push("This unfairly judges people based on background rather than merit");
+    }
+    if (allTypes.some(t => t.includes('anchoring') || t.includes('first impression'))) {
+      warnings.push("This can limit your perspective and prevent better solutions");
+    }
+    if (allTypes.some(t => t.includes('confirmation'))) {
+      warnings.push("This reinforces existing beliefs without considering alternatives");
+    }
+    
+    return warnings.length > 0 ? warnings.join('. ') : "This language may be unintentionally biased";
+  };
+
+  const getRecommendedSentence = (originalText: string, rules: string[], ml: string[]) => {
+    const allTypes = [...new Set([...rules, ...ml])];
+    
+    if (allTypes.length === 0) return "Your message is already bias-free!";
+    
+    let recommendation = originalText;
+    
+    // Replace problematic patterns with inclusive alternatives
+    if (allTypes.some(t => t.includes('groupthink') || t.includes('agrees'))) {
+      recommendation = recommendation.replace(/everyone agrees|we all think|nobody disagrees/gi, "several team members support this");
+    }
+    if (allTypes.some(t => t.includes('finalize'))) {
+      recommendation = recommendation.replace(/let's finalize|finalize this/gi, "let's move forward with this approach");
+    }
+    if (allTypes.some(t => t.includes('stereotyping') || t.includes('women') || t.includes('men'))) {
+      recommendation = recommendation.replace(/all women|all men|males are|females are/gi, "some people");
+    }
+    if (allTypes.some(t => t.includes('toxic') || t.includes('stupid') || t.includes('terrible'))) {
+      recommendation = recommendation.replace(/stupid|terrible|awful|hate/gi, "challenging");
+    }
+    if (allTypes.some(t => t.includes('generalization') || t.includes('everyone') || t.includes('always') || t.includes('never'))) {
+      recommendation = recommendation.replace(/everyone|always|never|all/gi, "many people");
+    }
+    if (allTypes.some(t => t.includes('iit') || t.includes('better'))) {
+      recommendation = recommendation.replace(/from iit.*better|he'll be better/gi, "with relevant experience");
+    }
+    if (allTypes.some(t => t.includes('anchoring'))) {
+      recommendation = recommendation.replace(/first impression|initial thought/gi, "one perspective");
+    }
+    if (allTypes.some(t => t.includes('confirmation'))) {
+      recommendation = recommendation.replace(/proves my point|as expected/gi, "supports this view");
+    }
+    
+    return recommendation;
+  };
 
 
   return (
