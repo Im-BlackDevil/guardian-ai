@@ -1,10 +1,12 @@
 import { motion } from "framer-motion";
 import { Link, useLocation } from "react-router-dom";
-import { Shield, TrendingUp } from "lucide-react";
+import { Shield, TrendingUp, Menu, X } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { useState } from "react";
 
 const Navigation = () => {
   const location = useLocation();
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   
   const navigationItems = [
     { name: "Dashboard", path: "/dashboard" },
@@ -20,6 +22,10 @@ const Navigation = () => {
     if (path === "/" && location.pathname === "/") return true;
     if (path !== "/" && location.pathname.startsWith(path)) return true;
     return false;
+  };
+
+  const toggleMobileMenu = () => {
+    setIsMobileMenuOpen(!isMobileMenuOpen);
   };
 
   return (
@@ -42,7 +48,7 @@ const Navigation = () => {
             <span className="text-xl font-bold">BiasShield AI</span>
           </Link>
 
-          {/* Navigation Links */}
+          {/* Desktop Navigation Links */}
           <div className="hidden md:flex items-center space-x-1">
             {navigationItems.map((item) => (
               <Link
@@ -59,20 +65,71 @@ const Navigation = () => {
             ))}
           </div>
 
-          {/* Right Side - Bias Counter */}
+          {/* Right Side - Bias Counter & Mobile Menu Button */}
           <div className="flex items-center space-x-4">
-            <motion.div
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              transition={{ delay: 0.8, type: "spring" }}
+            {/* Bias Counter - Hidden on very small screens */}
+            <div className="hidden sm:block">
+              <motion.div
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{ delay: 0.8, type: "spring" }}
+              >
+                <Badge variant="outline" className="bg-success/10 text-success border-success/20">
+                  <TrendingUp className="h-3 w-3 mr-1" />
+                  33 biases detected
+                </Badge>
+              </motion.div>
+            </div>
+
+            {/* Mobile Menu Button */}
+            <button
+              onClick={toggleMobileMenu}
+              className="md:hidden p-2 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
             >
-              <Badge variant="outline" className="bg-success/10 text-success border-success/20">
-                <TrendingUp className="h-3 w-3 mr-1" />
-                33 biases detected
-              </Badge>
-            </motion.div>
+              {isMobileMenuOpen ? (
+                <X className="h-6 w-6" />
+              ) : (
+                <Menu className="h-6 w-6" />
+              )}
+            </button>
           </div>
         </div>
+
+        {/* Mobile Navigation Menu */}
+        {isMobileMenuOpen && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.3 }}
+            className="md:hidden border-t border-border bg-card/95 backdrop-blur-md"
+          >
+            <div className="py-4 space-y-2">
+              {navigationItems.map((item) => (
+                <Link
+                  key={item.name}
+                  to={item.path}
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className={`block px-4 py-3 text-base font-medium transition-all duration-200 rounded-md mx-2 ${
+                    isActive(item.path)
+                      ? "bg-primary text-primary-foreground"
+                      : "text-muted-foreground hover:text-foreground hover:bg-muted"
+                  }`}
+                >
+                  {item.name}
+                </Link>
+              ))}
+              
+              {/* Mobile Bias Counter */}
+              <div className="px-4 py-3">
+                <Badge variant="outline" className="bg-success/10 text-success border-success/20 w-full justify-center">
+                  <TrendingUp className="h-3 w-3 mr-1" />
+                  33 biases detected
+                </Badge>
+              </div>
+            </div>
+          </motion.div>
+        )}
       </div>
     </motion.nav>
   );

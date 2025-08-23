@@ -355,35 +355,37 @@ const RealTimeBiasBot = () => {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.8 }}
-      className="py-16 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-primary/5 via-accent/5 to-primary/5"
+      className="py-8 sm:py-12 lg:py-16 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-primary/5 via-accent/5 to-primary/5"
     >
       <div className="container mx-auto max-w-6xl">
         <motion.div
           initial={{ y: 30, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ duration: 0.6 }}
-          className="text-center mb-12"
+          className="text-center mb-8 sm:mb-12"
         >
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">Real-Time Bias Detection Bot</h2>
-          <p className="text-xl text-muted-foreground">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-3 sm:mb-4 px-2">Real-Time Bias Detection Bot</h2>
+          <p className="text-lg sm:text-xl text-muted-foreground px-4">
             Experience live bias detection as you type. This simulates how BiasShield AI works in real chat platforms.
           </p>
         </motion.div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 sm:gap-8">
           {/* Chat Interface */}
           <motion.div
             initial={{ x: -50, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
             transition={{ duration: 0.6, delay: 0.2 }}
-            className="lg:col-span-2"
+            className="xl:col-span-2"
           >
-                         <Card className="shadow-card h-[600px] flex flex-col overflow-hidden">
-                           <CardHeader className="border-b border-border flex-shrink-0">
-                             <CardTitle className="flex items-center">
-                               <MessageSquare className="h-5 w-5 mr-2 text-primary" />
-                               Live Chat Simulation
-                               <Badge variant="outline" className="ml-2 bg-success/10 text-success border-success/20">
+                         <Card className="shadow-card h-[500px] sm:h-[550px] lg:h-[600px] flex flex-col overflow-hidden">
+                           <CardHeader className="border-b border-border flex-shrink-0 p-4 sm:p-6">
+                             <CardTitle className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-0">
+                               <div className="flex items-center">
+                                 <MessageSquare className="h-4 w-4 sm:h-5 sm:w-5 mr-2 text-primary" />
+                                 <span className="text-base sm:text-lg">Live Chat Simulation</span>
+                               </div>
+                               <Badge variant="outline" className="bg-success/10 text-success border-success/20 text-xs sm:text-sm">
                                  <Bot className="h-3 w-3 mr-1" />
                                  AI Active
                                </Badge>
@@ -392,22 +394,22 @@ const RealTimeBiasBot = () => {
                            
                            <CardContent className="flex-1 flex flex-col p-0 min-h-0">
                              {/* Messages Area - Fixed height with proper scrolling */}
-                             <div className="flex-1 overflow-y-auto p-4 space-y-4 min-h-0">
+                             <div className="flex-1 overflow-y-auto p-3 sm:p-4 space-y-3 sm:space-y-4 min-h-0">
                                {messages.map((message) => (
                                  <motion.div
                                    key={message.id}
                                    initial={{ opacity: 0, y: 20 }}
                                    animate={{ opacity: 1, y: 0 }}
-                                   className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'} mb-4`}
+                                   className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'} mb-3 sm:mb-4`}
                                  >
-                                   <div className={`max-w-[80%] ${message.sender === 'user' ? 'order-2' : 'order-1'}`}>
-                                     <div className={`rounded-lg p-3 ${
+                                   <div className={`max-w-[85%] sm:max-w-[80%] ${message.sender === 'user' ? 'order-2' : 'order-1'}`}>
+                                     <div className={`rounded-lg p-2 sm:p-3 ${
                                        message.sender === 'user' 
                                          ? 'bg-primary text-primary-foreground' 
                                          : 'bg-muted'
                                      }`}>
-                                       <div className="text-sm whitespace-pre-wrap break-words">{message.text}</div>
-                                       <div className={`text-xs mt-2 ${
+                                       <div className="text-xs sm:text-sm whitespace-pre-wrap break-words">{message.text}</div>
+                                       <div className={`text-xs mt-1 sm:mt-2 ${
                                          message.sender === 'user' ? 'text-primary-foreground/70' : 'text-muted-foreground'
                                        }`}>
                                          {message.timestamp.toLocaleTimeString()}
@@ -419,7 +421,7 @@ const RealTimeBiasBot = () => {
                                        <motion.div
                                          initial={{ scale: 0.8, opacity: 0 }}
                                          animate={{ scale: 1, opacity: 1 }}
-                                         className={`mt-2 flex items-center space-x-2 ${getSeverityColor(message.biasAnalysis.overallRisk)} px-3 py-2 rounded-md border max-w-full`}
+                                         className={`mt-2 flex items-center space-x-2 ${getSeverityColor(message.biasAnalysis.overallRisk)} px-2 sm:px-3 py-1 sm:py-2 rounded-md border max-w-full`}
                                        >
                                          {getSeverityIcon(message.biasAnalysis.overallRisk)}
                                          <span className="text-xs font-medium truncate">{message.biasAnalysis.overallRisk.toUpperCase()}</span>
@@ -434,17 +436,17 @@ const RealTimeBiasBot = () => {
                                  <motion.div
                                    initial={{ opacity: 0, scale: 0.8 }}
                                    animate={{ opacity: 1, scale: 1 }}
-                                   className="flex justify-start mb-4"
+                                   className="flex justify-start mb-3 sm:mb-4"
                                  >
-                                   <div className="bg-muted rounded-lg p-3 max-w-[80%]">
+                                   <div className="bg-muted rounded-lg p-2 sm:p-3 max-w-[85%] sm:max-w-[80%]">
                                      <div className="flex items-center space-x-2">
                                        <motion.div
                                          animate={{ rotate: 360 }}
                                          transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
                                        >
-                                         <Zap className="h-4 w-4 text-primary" />
+                                         <Zap className="h-3 w-3 sm:h-4 sm:w-4 text-primary" />
                                        </motion.div>
-                                       <span className="text-sm text-muted-foreground">Analyzing for biases...</span>
+                                       <span className="text-xs sm:text-sm text-muted-foreground">Analyzing for biases...</span>
                                      </div>
                                    </div>
                                  </motion.div>
@@ -455,17 +457,17 @@ const RealTimeBiasBot = () => {
                                  <motion.div
                                    initial={{ opacity: 0, scale: 0.8 }}
                                    animate={{ opacity: 1, scale: 1 }}
-                                   className="flex justify-start mb-4"
+                                   className="flex justify-start mb-3 sm:mb-4"
                                  >
-                                   <div className="bg-primary/10 border border-primary/20 rounded-lg p-3 max-w-[80%]">
+                                   <div className="bg-primary/10 border border-primary/20 rounded-lg p-2 sm:p-3 max-w-[85%] sm:max-w-[80%]">
                                      <div className="flex items-center space-x-2">
                                        <motion.div
                                          animate={{ rotate: 360 }}
                                          transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
                                        >
-                                         <Bot className="h-4 w-4 text-primary" />
+                                         <Bot className="h-3 w-3 sm:h-4 sm:w-4 text-primary" />
                                        </motion.div>
-                                       <span className="text-sm text-primary font-medium">Analyzing demo message...</span>
+                                       <span className="text-xs sm:text-sm text-primary font-medium">Analyzing demo message...</span>
                                      </div>
                                    </div>
                                  </motion.div>
@@ -476,25 +478,26 @@ const RealTimeBiasBot = () => {
                              </div>
                            
                              {/* Input Area - Fixed at bottom */}
-                             <div className="border-t border-border p-4 flex-shrink-0">
+                             <div className="border-t border-border p-3 sm:p-4 flex-shrink-0">
                                <div className="flex space-x-2">
                                  <Input
                                    value={inputText}
                                    onChange={(e) => setInputText(e.target.value)}
                                    onKeyPress={handleKeyPress}
                                    placeholder="Type a message to test bias detection..."
-                                   className="flex-1"
+                                   className="flex-1 text-sm sm:text-base"
                                    disabled={isAnalyzing}
                                  />
                                  <Button 
                                    onClick={handleSendMessage} 
                                    disabled={!inputText.trim() || isAnalyzing}
                                    size="sm"
+                                   className="px-3 sm:px-4"
                                  >
-                                   <Send className="h-4 w-4" />
+                                   <Send className="h-3 w-3 sm:h-4 sm:w-4" />
                                  </Button>
                                </div>
-                               <p className="text-xs text-muted-foreground mt-2">
+                               <p className="text-xs text-muted-foreground mt-2 leading-relaxed">
                                  Try phrases like "Everyone agrees with this" or "This guy is from IIT, he'll be better", or click "Demo Chat" for a random bias example
                                </p>
                              </div>
@@ -507,72 +510,73 @@ const RealTimeBiasBot = () => {
             initial={{ x: 50, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
             transition={{ duration: 0.6, delay: 0.4 }}
+            className="xl:col-span-1"
           >
-            <Card className="shadow-card h-[600px]">
-              <CardHeader>
-                <CardTitle className="flex items-center">
-                  <Shield className="h-5 w-5 mr-2 text-primary" />
+            <Card className="shadow-card h-[500px] sm:h-[550px] lg:h-[600px]">
+              <CardHeader className="p-4 sm:p-6">
+                <CardTitle className="flex items-center text-base sm:text-lg">
+                  <Shield className="h-4 w-4 sm:h-5 sm:w-5 mr-2 text-primary" />
                   Bias Scorecard
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-6">
+              <CardContent className="space-y-4 sm:space-y-6 p-4 sm:p-6">
                 {/* Total Biases */}
                 <div className="text-center">
-                  <div className="text-3xl font-bold text-primary mb-1">{biasStats.total}</div>
-                  <div className="text-sm text-muted-foreground">Total Biases Detected</div>
+                  <div className="text-2xl sm:text-3xl font-bold text-primary mb-1">{biasStats.total}</div>
+                  <div className="text-xs sm:text-sm text-muted-foreground">Total Biases Detected</div>
                 </div>
                 
                 {/* Bias Breakdown */}
-                <div className="space-y-4">
+                <div className="space-y-3 sm:space-y-4">
                   <div className="flex items-center justify-between">
-                    <span className="text-sm">Groupthink</span>
-                    <Badge variant="outline" className="bg-warning/10 text-warning border-warning/20">
+                    <span className="text-xs sm:text-sm">Groupthink</span>
+                    <Badge variant="outline" className="bg-warning/10 text-warning border-warning/20 text-xs">
                       {biasStats.groupthink}
                     </Badge>
                   </div>
                   
                   <div className="flex items-center justify-between">
-                    <span className="text-sm">Anchoring</span>
-                    <Badge variant="outline" className="bg-success/10 text-success border-success/20">
+                    <span className="text-xs sm:text-sm">Anchoring</span>
+                    <Badge variant="outline" className="bg-success/10 text-success border-success/20 text-xs">
                       {biasStats.anchoring}
                     </Badge>
                   </div>
                   
                   <div className="flex items-center justify-between">
-                    <span className="text-sm">Gender/Cultural</span>
-                    <Badge variant="outline" className="bg-destructive/10 text-destructive border-destructive/20">
+                    <span className="text-xs sm:text-sm">Gender/Cultural</span>
+                    <Badge variant="outline" className="bg-destructive/10 text-destructive border-destructive/20 text-xs">
                       {biasStats.genderCultural}
                     </Badge>
                   </div>
                   
                   <div className="flex items-center justify-between">
-                    <span className="text-sm">Toxic Tone</span>
-                    <Badge variant="outline" className="bg-destructive/10 text-destructive border-destructive/20">
+                    <span className="text-xs sm:text-sm">Toxic Tone</span>
+                    <Badge variant="outline" className="bg-destructive/10 text-destructive border-destructive/20 text-xs">
                       {biasStats.toxic}
                     </Badge>
                   </div>
                   
                   <div className="flex items-center justify-between">
-                    <span className="text-sm">Confirmation</span>
-                    <Badge variant="outline" className="bg-warning/10 text-warning border-warning/20">
+                    <span className="text-xs sm:text-sm">Confirmation</span>
+                    <Badge variant="outline" className="bg-warning/10 text-warning border-warning/20 text-xs">
                       {biasStats.confirmation}
                     </Badge>
                   </div>
                   
                   <div className="flex items-center justify-between">
-                    <span className="text-sm">Stereotyping</span>
-                    <Badge variant="outline" className="bg-destructive/10 text-destructive border-destructive/20">
+                    <span className="text-xs sm:text-sm">Stereotyping</span>
+                    <Badge variant="outline" className="bg-destructive/10 text-destructive border-destructive/20 text-xs">
                       {biasStats.stereotyping}
                     </Badge>
                   </div>
                 </div>
                 
                 {/* Quick Actions */}
-                <div className="space-y-3 pt-4 border-t border-border">
+                <div className="space-y-2 sm:space-y-3 pt-3 sm:pt-4 border-t border-border">
                                      <Button 
                      variant="outline" 
                      size="sm" 
-                     className="w-full"
+                     className="w-full text-xs sm:text-sm"
                                            onClick={() => {
                         setMessages([{
                           id: '1',
@@ -601,7 +605,7 @@ const RealTimeBiasBot = () => {
                                      <Button 
                      variant="outline" 
                      size="sm" 
-                     className="w-full"
+                     className="w-full text-xs sm:text-sm"
                      onClick={demoChat}
                      disabled={isDemoRunning}
                    >
@@ -618,19 +622,19 @@ const RealTimeBiasBot = () => {
           initial={{ y: 30, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ duration: 0.6, delay: 0.6 }}
-          className="mt-12 text-center"
+          className="mt-8 sm:mt-12 text-center"
         >
           <Card className="shadow-card border-primary/20 bg-gradient-to-r from-primary/5 to-accent/5">
-            <CardContent className="p-6">
-              <h3 className="text-xl font-semibold mb-3">Ready for Real Integration?</h3>
-              <p className="text-muted-foreground mb-4">
+            <CardContent className="p-4 sm:p-6">
+              <h3 className="text-lg sm:text-xl font-semibold mb-2 sm:mb-3">Ready for Real Integration?</h3>
+              <p className="text-muted-foreground mb-3 sm:mb-4 text-sm sm:text-base">
                 This demo shows how BiasShield AI would work in Discord, Slack, Microsoft Teams, and other chat platforms.
               </p>
-              <div className="flex flex-wrap justify-center gap-4">
-                <Badge variant="outline" className="px-3 py-1">Discord Bot</Badge>
-                <Badge variant="outline" className="px-3 py-1">Slack Integration</Badge>
-                <Badge variant="outline" className="px-3 py-1">Teams Webhook</Badge>
-                <Badge variant="outline" className="px-3 py-1">CLI Tool</Badge>
+              <div className="flex flex-wrap justify-center gap-2 sm:gap-4">
+                <Badge variant="outline" className="px-2 sm:px-3 py-1 text-xs sm:text-sm">Discord Bot</Badge>
+                <Badge variant="outline" className="px-2 sm:px-3 py-1 text-xs sm:text-sm">Slack Integration</Badge>
+                <Badge variant="outline" className="px-2 sm:px-3 py-1 text-xs sm:text-sm">Teams Webhook</Badge>
+                <Badge variant="outline" className="px-2 sm:px-3 py-1 text-xs sm:text-sm">CLI Tool</Badge>
               </div>
             </CardContent>
           </Card>
