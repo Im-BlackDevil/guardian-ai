@@ -8,7 +8,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 
 // Guardian AI imports
-import guardianRoutes from './backend/routes/guardian.js';
+import guardianRoutes from './routes/guardian.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -17,7 +17,12 @@ const app = express();
 const PORT = process.env.PORT || 3001;
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: ['http://localhost:8080', 'http://localhost:3000', 'http://localhost:5173'],
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
 app.use(express.json());
 app.use(express.static('public'));
 
@@ -27,7 +32,7 @@ const upload = multer({
   limits: {
     fileSize: 10 * 1024 * 1024, // 10MB limit
   },
-  fileFilter: (req, file, cb) => {
+  fileFilter: (req: any, file: Express.Multer.File, cb: any) => {
     const allowedTypes = ['.txt', '.docx', '.pdf', '.csv'];
     const ext = path.extname(file.originalname).toLowerCase();
     if (allowedTypes.includes(ext)) {
@@ -48,7 +53,7 @@ const biasPatterns = {
 };
 
 // Function to detect and replace biases
-function removeBiases(text) {
+function removeBiases(text: string): string {
   let improvedText = text;
   
   // Replace gender biases
@@ -65,7 +70,7 @@ function removeBiases(text) {
   
   // Replace toxic language
   improvedText = improvedText.replace(biasPatterns.toxic, (match) => {
-    const replacements = {
+    const replacements: Record<string, string> = {
       'stupid': 'challenging',
       'idiot': 'difficult',
       'terrible': 'problematic',
@@ -81,7 +86,7 @@ function removeBiases(text) {
 }
 
 // Function to extract text from different file types
-async function extractText(file) {
+async function extractText(file: Express.Multer.File): Promise<string> {
   const buffer = file.buffer;
   const ext = path.extname(file.originalname).toLowerCase();
   
@@ -97,77 +102,53 @@ async function extractText(file) {
       case '.csv':
         const csvText = buffer.toString('utf-8');
         const parsed = Papa.parse(csvText, { header: true });
-        return parsed.data.map(row => Object.values(row).join(' ')).join('\n');
+        return parsed.data.map((row: any) => Object.values(row).join(' ')).join('\n');
         
       case '.pdf':
-        // For PDF, we'll use a simple text extraction
-        // In production, you'd use pdf-parse or similar
-        return "PDF content extracted. Note: For full PDF text extraction, consider using a backend service with pdf-parse library.";
+        // For PDF, we'll return a placeholder since pdf-parse might not be available
+        return 'PDF text extraction not implemented in this version';
         
       default:
-        throw new Error('Unsupported file type');
+        throw new Error(`Unsupported file type: ${ext}`);
     }
   } catch (error) {
-    throw new Error(`Failed to extract text from ${ext} file: ${error.message}`);
+    console.error('Error extracting text:', error);
+    throw new Error(`Failed to extract text from ${file.originalname}`);
   }
 }
 
-// Function to generate PDF from text
-function generatePDF(text, analysisResult) {
+// Function to generate PDF
+async function generatePDF(text: string, analysisResult: any): Promise<Buffer> {
   return new Promise((resolve, reject) => {
     try {
-      const doc = new PDFDocument({
-        size: 'A4',
-        margins: {
-          top: 50,
-          bottom: 50,
-          left: 50,
-          right: 50
-        }
-      });
+      const doc = new PDFDocument();
+      const chunks: Buffer[] = [];
       
-      const chunks = [];
-      doc.on('data', chunk => chunks.push(chunk));
+      doc.on('data', (chunk) => chunks.push(chunk));
       doc.on('end', () => resolve(Buffer.concat(chunks)));
       
-      // Add header
-      doc.fontSize(24)
+      // Add title
+      doc.fontSize(18)
          .font('Helvetica-Bold')
-         .text('Bias-Free Document', { align: 'center' });
+         .text('Bias-Free Document Analysis', { align: 'center' });
       
       doc.moveDown();
       
-      // Add metadata
-      doc.fontSize(12)
-         .font('Helvetica')
-         .text(`Generated on: ${new Date().toLocaleDateString()}`);
-      
-      doc.text(`Original biases detected: ${analysisResult.counts.total}`);
-      doc.text(`Bias types found: ${Object.keys(analysisResult.counts.byType).join(', ')}`);
-      
-      doc.moveDown();
-      
-      // Add improved content
-      doc.fontSize(16)
-         .font('Helvetica-Bold')
-         .text('Improved Content:');
-      
-      doc.moveDown();
-      
-      doc.fontSize(11)
-         .font('Helvetica')
-         .text(text, {
-           align: 'justify',
-           lineGap: 2
-         });
-      
-      // Add analysis summary
-      doc.moveDown(2);
+      // Add summary
       doc.fontSize(14)
          .font('Helvetica-Bold')
-         .text('Analysis Summary:');
+         .text('Summary');
+      
+      doc.fontSize(12)
+         .font('Helvetica')
+         .text(`Total biases detected: ${analysisResult.counts.total}`);
       
       doc.moveDown();
+      
+      // Add bias types
+      doc.fontSize(14)
+         .font('Helvetica-Bold')
+         .text('Bias Types Found:');
       
       Object.entries(analysisResult.counts.byType).forEach(([type, count]) => {
         doc.fontSize(10)
@@ -196,7 +177,7 @@ app.post('/api/generate-bias-free', upload.single('file'), async (req, res) => {
     console.log('Text extracted, length:', originalText.length);
     
     // Analyze for biases (simplified analysis)
-    const biases = [];
+    const biases: string[] = [];
     Object.entries(biasPatterns).forEach(([type, pattern]) => {
       const matches = originalText.match(pattern);
       if (matches) {
@@ -215,7 +196,7 @@ app.post('/api/generate-bias-free', upload.single('file'), async (req, res) => {
       })),
       counts: {
         total: biases.length,
-        byType: biases.reduce((acc, type) => {
+        byType: biases.reduce((acc: Record<string, number>, type: string) => {
           acc[type] = (acc[type] || 0) + 1;
           return acc;
         }, {}),
@@ -246,7 +227,7 @@ app.post('/api/generate-bias-free', upload.single('file'), async (req, res) => {
     console.error('Error generating bias-free PDF:', error);
     res.status(500).json({ 
       error: 'Failed to generate bias-free PDF',
-      details: error.message 
+      details: error instanceof Error ? error.message : 'Unknown error'
     });
   }
 });

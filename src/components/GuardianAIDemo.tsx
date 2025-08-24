@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { X, Brain, CheckCircle, XCircle, AlertTriangle, Clock, Zap } from "lucide-react";
+import { buildApiUrl, API_CONFIG } from "@/config/api";
 
 interface ModelResponse {
   id: string;
@@ -89,6 +90,30 @@ const GuardianAIDemo = ({ onClose }: { onClose: () => void }) => {
     setGuardianDecision(guardianResult);
     setShowResults(true);
     setIsRunning(false);
+
+    // Send to Guardian AI backend for logging
+    try {
+      await fetch(buildApiUrl(API_CONFIG.ENDPOINTS.GUARDIAN.LOGS), {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          action: 'Guardian AI Demo - Multi-model coordination',
+          context: 'Demonstrating Guardian AI decision making with 3 AI models',
+          status: guardianResult.decision,
+          reason: guardianResult.reasoning,
+          metadata: {
+            modelResponses: mockModels,
+            finalDecision: guardianResult,
+            demoMode: true
+          }
+        })
+      });
+      console.log('Guardian AI demo logged successfully');
+    } catch (error) {
+      console.log('Guardian AI logging failed (demo mode):', error);
+    }
   };
 
   const getDecisionColor = (decision: string) => {

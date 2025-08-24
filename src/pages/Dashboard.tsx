@@ -57,7 +57,7 @@ const Dashboard = () => {
 
               <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold mb-6">
                 <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-                  Protect Your Team from Hidden Biases
+                Stop bias. Prevent mistakes. Protect users.
                 </span>
               </h1>
 

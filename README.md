@@ -113,9 +113,8 @@ npm run dev
 }
 ```
 
----
+--
 
-## 🏆 Hackathon Pitch
 AI is growing everywhere — but **who watches the AI?**  
 Guardian AI is the **oversight layer** that keeps AIs **safe, fair, and trustworthy**.  
 - Protects users from **AI accidents**.  
