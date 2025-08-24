@@ -1,13 +1,15 @@
 import { motion } from "framer-motion";
-import { Shield, Bot, TrendingUp, Users, Zap, Upload, Play, X } from "lucide-react";
+import { Shield, Bot, TrendingUp, Users, Zap, Upload, Play, X, Brain } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useState } from "react";
 import RealTimeBiasBot from "./RealTimeBiasBot";
+import GuardianAIDemo from "./GuardianAIDemo";
 import { Link } from "react-router-dom";
 
 const HeroSection = () => {
   const [showDemo, setShowDemo] = useState(false);
+  const [showGuardianDemo, setShowGuardianDemo] = useState(false);
 
   const features = [
     {
@@ -125,6 +127,15 @@ const HeroSection = () => {
                 <Play className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
                 Try Live Demo
               </Button>
+              <Button 
+                variant="outline" 
+                size="lg" 
+                className="text-sm sm:text-base lg:text-lg px-5 sm:px-6 lg:px-8 py-3 sm:py-4 lg:py-6 w-full sm:w-auto h-12 sm:h-14 bg-teal-600 hover:bg-teal-700 border-teal-600 hover:border-teal-700 text-white"
+                onClick={() => setShowGuardianDemo(true)}
+              >
+                <Brain className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
+                Guardian AI Demo
+              </Button>
             </div>
           </motion.div>
 
@@ -188,6 +199,11 @@ const HeroSection = () => {
           </motion.div>
         </div>
       </section>
+
+      {/* Guardian AI Demo Modal */}
+      {showGuardianDemo && (
+        <GuardianAIDemo onClose={() => setShowGuardianDemo(false)} />
+      )}
     </div>
   );
 };
