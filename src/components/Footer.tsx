@@ -31,7 +31,7 @@ const Footer = () => {
                 <div className="absolute -top-1 -right-1 w-2 h-2 bg-primary rounded-full animate-pulse" />
               </div>
               <span className="text-base sm:text-lg font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-                BiasShield AI
+                Guardian AI Suite
               </span>
             </div>
             <div className="text-xs sm:text-sm text-muted-foreground text-center md:text-left">
@@ -75,7 +75,7 @@ const Footer = () => {
           transition={{ duration: 0.8, delay: 0.6 }}
         >
           <div className="mb-2 md:mb-0 text-center md:text-left">
-            © {currentYear} BiasShield AI. All rights reserved.
+            © {currentYear} Guardian AI Suite. All rights reserved.
           </div>
           <div className="flex flex-col sm:flex-row items-center space-y-1 sm:space-y-0 sm:space-x-4 text-center">
             <span>Version 1.0.0</span>

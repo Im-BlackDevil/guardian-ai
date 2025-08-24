@@ -103,7 +103,7 @@ const HeroSection = () => {
             
             <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold mb-3 sm:mb-4 lg:mb-6 px-2 leading-tight">
               <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-                Protect Your Team from Hidden Biases
+                Stop bias. Prevent mistakes. Protect users.
               </span>
             </h1>
             
