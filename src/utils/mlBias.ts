@@ -1,12 +1,14 @@
 // Enhanced ML bias detection with comprehensive patterns and context awareness
 // This provides better bias detection than the simplified version
 
+import { enhancedBiasDetector } from './enhancedBiasDatasets';
+
 let modelLoaded = false;
 
 // Load model once
 export async function loadModel() {
   try {
-    // Enhanced bias detection model
+    // Enhanced bias detection model with comprehensive datasets
     modelLoaded = true;
     return true;
   } catch (error) {
@@ -121,89 +123,39 @@ export async function detectBiasML(text: string) {
       await loadModel();
     }
 
-    // Check if text contains positive/neutral contexts (should NOT trigger bias)
-    const isPositiveContext = hasPositiveContext(text);
+    // Use the enhanced bias detector with comprehensive datasets
+    const enhancedResult = enhancedBiasDetector.detectBias(text);
     
-    // If it's a positive/neutral message, don't detect bias
-    if (isPositiveContext) {
+    if (!enhancedResult.hasBias) {
       return [];
     }
 
-    // Enhanced ML bias detection using comprehensive text analysis
-    const lowerText = text.toLowerCase();
-    const mlFlags = [];
+    // Map enhanced bias types to existing system types
+    const biasTypeMapping: { [key: string]: string } = {
+      'gender_stereotyping': 'gender_bias',
+      'age_bias': 'age_bias',
+      'educational_bias': 'cultural_bias',
+      'hierarchical_bias': 'stereotyping',
+      'department_stereotyping': 'stereotyping',
+      'racial_stereotyping': 'stereotyping',
+      'religious_bias': 'stereotyping',
+      'nationality_bias': 'stereotyping',
+      'socioeconomic_bias': 'stereotyping',
+      'confirmation_bias': 'confirmation',
+      'anchoring_bias': 'anchoring',
+      'groupthink': 'groupthink',
+      'availability_bias': 'generalization',
+      'toxic_language': 'toxic',
+      'dismissive_language': 'toxic',
+      'stereotyping': 'stereotyping',
+      'generalization': 'generalization'
+    };
 
-    // Check for toxic language patterns
-    if (lowerText.includes('stupid') || lowerText.includes('terrible') || lowerText.includes('awful') ||
-        lowerText.includes('hate') || lowerText.includes('kill') || lowerText.includes('idiot')) {
-      mlFlags.push('toxic');
-    }
+    const mappedBiases = enhancedResult.biasTypes.map(type => 
+      biasTypeMapping[type] || type
+    );
 
-    // Check for discriminatory language and stereotyping (only in negative contexts)
-    if ((lowerText.includes('all') || lowerText.includes('every')) &&
-        (lowerText.includes('women') || lowerText.includes('men') || lowerText.includes('people') ||
-         lowerText.includes('students') || lowerText.includes('workers')) &&
-        !isPositiveContext) {
-      mlFlags.push('stereotyping');
-    }
-
-    // Check for gender bias (only in negative contexts)
-    if ((lowerText.includes('males') || lowerText.includes('females') ||
-         lowerText.includes('guys') || lowerText.includes('girls')) &&
-        !isPositiveContext) {
-      mlFlags.push('gender_bias');
-    }
-
-    // Check for over-generalizations (only in negative contexts)
-    if ((lowerText.includes('always') || lowerText.includes('never') ||
-         lowerText.includes('everyone') || lowerText.includes('nobody')) &&
-        !isPositiveContext) {
-      mlFlags.push('generalization');
-    }
-
-    // Check for groupthink patterns (only in negative contexts)
-    if ((lowerText.includes('everyone agrees') || lowerText.includes('we all think') ||
-         lowerText.includes('nobody disagrees') || lowerText.includes('consensus')) &&
-        !isPositiveContext) {
-      mlFlags.push('groupthink');
-    }
-
-    // Check for anchoring bias (only in negative contexts)
-    if ((lowerText.includes('first impression') || lowerText.includes('initial thought') ||
-         lowerText.includes('started with') || lowerText.includes('began with')) &&
-        !isPositiveContext) {
-      mlFlags.push('anchoring');
-    }
-
-    // Check for confirmation bias (only in negative contexts)
-    if ((lowerText.includes('proves my point') || lowerText.includes('confirms what i thought') ||
-         lowerText.includes('as expected') || lowerText.includes('i knew it')) &&
-        !isPositiveContext) {
-      mlFlags.push('confirmation');
-    }
-
-    // Check for cultural/educational bias (only in negative contexts)
-    if ((lowerText.includes('from iit') || lowerText.includes('from harvard') ||
-         lowerText.includes('cultural background') || lowerText.includes('ethnicity')) &&
-        !isPositiveContext) {
-      mlFlags.push('cultural_bias');
-    }
-
-    // Check for age bias (only in negative contexts)
-    if ((lowerText.includes('older people') || lowerText.includes('younger people') ||
-         lowerText.includes('age group')) &&
-        !isPositiveContext) {
-      mlFlags.push('age_bias');
-    }
-
-    // Use pattern matching for more accurate detection
-    biasPatterns.forEach(({ pattern, type }) => {
-      if (pattern.test(text) && !isPositiveContext) {
-        mlFlags.push(type);
-      }
-    });
-
-    return [...new Set(mlFlags)]; // Remove duplicates
+    return [...new Set(mappedBiases)]; // Remove duplicates
   } catch (error) {
     console.warn('ML bias detection failed:', error);
     return [];
